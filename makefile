@@ -11,6 +11,9 @@ all: run
 run:
 	$(PYTHON) $(MAIN) $(CONFIG)
 
+install: requirements.txt
+	pip install -r requirements.txt
+
 lint: 
 	$(FLAKE) && $(MYPY)
 
