@@ -1,10 +1,11 @@
-PYTHON = python3
+PYTHON = .venv/bin/python3
 CONFIG = config.txt
-FLAKE = flake8 -v
+FLAKE = flake8
 MYPY = mypy . --warn-return-any --warn-unused-ignores \
 --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 MYPY_STRICT = mypy . --strict
 MAIN = a_maze_ing.py
+SRC = src
 
 all: run
 
@@ -15,10 +16,10 @@ install: requirements.txt
 	pip install -r requirements.txt
 
 lint: 
-	$(FLAKE) && $(MYPY)
+	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)
 
 lint-strict:
-	$(FLAKE) && $(MYPY_STRICT)
+	$(FLAKE) $(MAIN) $(SRC) && $(MYPY_STRICT) 
 
 clean:
 	rm -rf __pycache__ .mypy_cache
