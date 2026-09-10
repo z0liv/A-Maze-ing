@@ -27,5 +27,6 @@ lint-strict:
 
 clean:
 	rm -rf __pycache__ .mypy_cache
+	rm -rf src/__pycache__
 
 .PHONY: run install lint lint-strict clean

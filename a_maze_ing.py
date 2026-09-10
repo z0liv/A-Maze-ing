@@ -1,5 +1,7 @@
 import sys
 import os
+from typing import Any
+from src.config import Config
 
 
 class InvalidConfigError(Exception):
@@ -14,6 +16,17 @@ class ParamsError(Exception):
     ) -> None:
         self.message = message
 
+def load_config(filename: str) -> Config:
+    data: dict[str, Any] = {}
+    with open(filename, "r") as config_file:
+        for line in config_file:
+            line = line.strip()
+            key, value = line.split("=", 1)
+            if (key.lower() == "entry" or key.lower() == "exit"):
+                value = (value.split(","))
+            data[key.lower()] = value
+    configmodel: Config = Config(**data)
+    return configmodel
 
 def main() -> None:
     if 'VIRTUAL_ENV' in os.environ:
@@ -30,10 +43,8 @@ def main() -> None:
                     prefix + f"expected 1 received {len(args) - 1}"
                     )
             else:
-                content: str
-                with open(args[1]) as config:
-                    content = config.read()
-                    print(content)
+                model: Config = load_config(args[1])
+                print(model)
             """
             Expects a function that detects invalid config
             such as: impossible maze, bad syntax.
