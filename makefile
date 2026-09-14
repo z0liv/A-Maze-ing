@@ -30,7 +30,7 @@ lint-strict:
 clean:
 	rm -rf __pycache__ .mypy_cache
 	rm -rf src/__pycache__
-	rm -rf venv
+	rm -rf .venv
 
 create-venv:
 	python3 -m venv .venv

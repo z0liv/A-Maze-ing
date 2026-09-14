@@ -6,13 +6,13 @@ from src.config import Config
 
 class InvalidConfigError(Exception):
     """
-    Custom error class to catch invalid config errors.
+    Exception raised when the configuration is invalid.
     """
     def __init__(self, messages: list[str]) -> None:
         """
-            Initialize the error message list.
+            Initialize the exception with a list of error messages.
 
-            Attributes:
+            Args:
                 messages (list[str]): List of one or multiple error messages.
         """
         prefix: str = "[ERROR] Invalid configuration: "
@@ -22,16 +22,16 @@ class InvalidConfigError(Exception):
 
 class ParamsError(Exception):
     """
-    Custom error class to catch errors on parameters.
+    Exception raised when the parameters are invalid.
     """
     def __init__(
         self,
         message: str = "[ERROR] Program should have the correct parameters"
     ) -> None:
         """
-            Initialize the error message.
+            Initialize the exception with an error message.
 
-            Attributes:
+            Args:
                 message (str): Message to raise with the exception,
                 with a default value.
         """
@@ -41,14 +41,14 @@ class ParamsError(Exception):
 
 def load_config(filename: str) -> None:
     """
-        Reads the config file from the filename given by parameter,
-        and stores it in the Config Model.
+        Read the configuration file and load its values into the Config model.
 
-        Parameters:
+        Args:
             filename (str): Name of the file to open and read.
 
-        Returns:
-            None
+        Raises:
+            ValueError: If the syntax of the config file is not "key=value".
+            InvalidConfigError: If the model attributes are incorrect.
     """
     data: dict[str, Any] = {}
     with open(filename, "r") as config_file:
@@ -77,12 +77,6 @@ def load_config(filename: str) -> None:
 
 
 def main() -> None:
-    """
-        Main function that initializes the program.
-
-        Returns:
-            None
-    """
     try:
         args = sys.argv
         if len(args) == 1:
