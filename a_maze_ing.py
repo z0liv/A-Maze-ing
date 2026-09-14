@@ -1,27 +1,55 @@
 import sys
-import os
 from typing import Any
 from pydantic import ValidationError
 from src.config import Config
 
 
 class InvalidConfigError(Exception):
-    def __init__(self, messages: list[str]):
+    """
+    Custom error class to catch invalid config errors.
+    """
+    def __init__(self, messages: list[str]) -> None:
+        """
+            Initialize the error message list.
+
+            Attributes:
+                messages (list[str]): List of one or multiple error messages.
+        """
         prefix: str = "[ERROR] Invalid configuration: "
         super().__init__(prefix + "\n{}".format("\n".join(messages)))
         self.messages = messages
 
 
 class ParamsError(Exception):
+    """
+    Custom error class to catch errors on parameters.
+    """
     def __init__(
         self,
         message: str = "[ERROR] Program should have the correct parameters"
     ) -> None:
+        """
+            Initialize the error message.
+
+            Attributes:
+                message (str): Message to raise with the exception,
+                with a default value.
+        """
         super().__init__(message)
         self.message = message
 
 
 def load_config(filename: str) -> None:
+    """
+        Reads the config file from the filename given by parameter,
+        and stores it in the Config Model.
+
+        Parameters:
+            filename (str): Name of the file to open and read.
+
+        Returns:
+            None
+    """
     data: dict[str, Any] = {}
     with open(filename, "r") as config_file:
         for line in config_file:
@@ -49,6 +77,12 @@ def load_config(filename: str) -> None:
 
 
 def main() -> None:
+    """
+        Main function that initializes the program.
+
+        Returns:
+            None
+    """
     try:
         args = sys.argv
         if len(args) == 1:
@@ -69,6 +103,7 @@ def main() -> None:
         print("[ERROR]", error)
     except ValueError as error:
         print("[ERROR]", error)
+
 
 if __name__ == "__main__":
     main()
