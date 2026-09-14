@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Annotated
 
+
 class Config(BaseModel):
     width: int = Field(ge=0, le=80)
     height: int = Field(ge=0, le=80)
@@ -9,7 +10,7 @@ class Config(BaseModel):
     exit: tuple[Annotated[int, Field(ge=0, le=80)],
                 Annotated[int, Field(ge=0, le=80)]]
     output_file: str = Field(default="maze.txt", max_length=25)
-    perfect: bool
+    perfect: bool = True
     seed: float = Field(default=0.123, ge=0.0, le=1.0)
 
     @model_validator(mode='after')
