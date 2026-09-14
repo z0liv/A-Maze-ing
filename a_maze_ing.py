@@ -31,8 +31,10 @@ def load_config(filename: str) -> None:
             try:
                 key, value = line.split("=", 1)
                 if (key.lower() == "entry" or key.lower() == "exit"):
-                    value = (value.split(","))
-                data[key.lower()] = value
+                    lst_value = (value.split(","))
+                    data[key.lower()] = lst_value
+                else:
+                    data[key.lower()] = value
             except ValueError:
                 prefix: str = "[ERROR] Config lines in 'config.txt'"
                 raise ValueError(prefix + " must be 'key=value' syntax")
