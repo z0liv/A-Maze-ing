@@ -1,23 +1,25 @@
-PYTHON = .venv/bin/python3
-DEBUG = python -m pdb
+VENV = .venv/bin
+PYTHON = ${VENV}/python3
+DEBUG = ${PYTHON} -m pdb
 CONFIG = config.txt
-FLAKE = flake8
-MYPY = mypy . --warn-return-any --warn-unused-ignores \
+FLAKE = ${VENV}/flake8
+MYPY = ${VENV}/mypy . --warn-return-any --warn-unused-ignores \
 --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-MYPY_STRICT = mypy . --strict
+MYPY_STRICT = ${VENV}/mypy . --strict
 MAIN = a_maze_ing.py
 SRC = src
 
 all: run
 
-run:
+run: create-venv install
+	clear
 	$(PYTHON) $(MAIN) $(CONFIG)
 
 debug:
 	$(DEBUG) $(MAIN) $(CONFIG)
 
 install: requirements.txt
-	pip install -r requirements.txt
+	$(PYTHON) -m pip install -r requirements.txt
 
 lint: 
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)
@@ -28,5 +30,9 @@ lint-strict:
 clean:
 	rm -rf __pycache__ .mypy_cache
 	rm -rf src/__pycache__
+	rm -rf venv
+
+create-venv:
+	python3 -m venv .venv
 
 .PHONY: run install lint lint-strict clean

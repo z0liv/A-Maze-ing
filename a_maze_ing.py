@@ -49,33 +49,26 @@ def load_config(filename: str) -> None:
 
 
 def main() -> None:
-    if 'VIRTUAL_ENV' in os.environ:
-        try:
-            args = sys.argv
-            if len(args) == 1:
-                prefix = "[ERROR] Missing config file"
-                raise ParamsError(prefix + ", expected 'config.txt'")
-            elif len(args) > 2:
-                prefix = "[ERROR] Too many params, "
-                raise ParamsError(
-                    prefix + f"expected 1 received {len(args) - 1}"
-                    )
-            else:
-                load_config(args[1])
-        except InvalidConfigError as error:
-            print(error)
-        except ParamsError as error:
-            print(error)
-        except FileNotFoundError as error:
-            print("[ERROR]", error)
-        except ValueError as error:
-            print("[ERROR]", error)
-    else:
-        print("WARNING: You're in the global environment!")
-        print("To run this project you must be in a virtual environment")
-        print("run:\npython -m venv .venv")
-        print("source .venv/bin/activate")
-
+    try:
+        args = sys.argv
+        if len(args) == 1:
+            prefix = "[ERROR] Missing config file"
+            raise ParamsError(prefix + ", expected 'config.txt'")
+        elif len(args) > 2:
+            prefix = "[ERROR] Too many params, "
+            raise ParamsError(
+                prefix + f"expected 1 received {len(args) - 1}"
+                )
+        else:
+            load_config(args[1])
+    except InvalidConfigError as error:
+        print(error)
+    except ParamsError as error:
+        print(error)
+    except FileNotFoundError as error:
+        print("[ERROR]", error)
+    except ValueError as error:
+        print("[ERROR]", error)
 
 if __name__ == "__main__":
     main()
