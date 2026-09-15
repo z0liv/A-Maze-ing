@@ -4,18 +4,19 @@ from typing import Annotated
 
 class Config(BaseModel):
     """
-    A class that represents the configuration file,
-    inherits from BaseModel to use the pydantic methods to validate.
+        Configuration model for the maze generator.
 
-    Attributes:
-        width (int): width of the maze.
-        height (int): height of the maze.
-        entry (tuple[Annotated[int, int]]): coordinates of the entry point.
-        exit (tuple[Annotated[int, int]]): coordinates of the exit point.
-        output_file (str): name of the output file of the generated maze.
-        perfect (bool): flag to generate a perfect or imperfect maze.
-        seed (float): seed to generate an specific maze
-    """
+        Inherits from BaseModel to provide data validation through Pydantic.
+
+        Attributes:
+            width (int): Width of the maze.
+            height (int): Height of the maze.
+            entry (tuple[int, int]): Coordinates of the entry point.
+            exit (tuple[int, int]): Coordinates of the exit point.
+            output_file (str): Name of the output file for the generated maze.
+            perfect (bool): Whether to generate a perfect or imperfect maze.
+            seed (float): Seed used to generate a specific maze.
+"""
     width: int = Field(ge=0, le=80)
     height: int = Field(ge=0, le=80)
     entry: tuple[Annotated[int, Field(ge=0, le=80)],
@@ -29,12 +30,7 @@ class Config(BaseModel):
     @model_validator(mode='after')
     def config_validation_rules(self) -> "Config":
         """
-        Validates the config model entry and exit based on height and width.
-
-        Parameters:
-            self (Config)
-        Returns:
-            self (Config)
+        Validate the entry and exit coordinates against the maze dimensions.
         """
         if (self.entry[0] > self.width):
             raise ValueError("Entry out of bounds")

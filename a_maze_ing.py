@@ -13,7 +13,7 @@ class InvalidConfigError(Exception):
             Initialize the exception with a list of error messages.
 
             Args:
-                messages (list[str]): List of one or multiple error messages.
+                messages: List of one or more error messages.
         """
         prefix: str = "[ERROR] Invalid configuration: "
         super().__init__(prefix + "\n{}".format("\n".join(messages)))
@@ -32,8 +32,8 @@ class ParamsError(Exception):
             Initialize the exception with an error message.
 
             Args:
-                message (str): Message to raise with the exception,
-                with a default value.
+                message: Error message to raise. Defaults to the
+                standard parameter error message.
         """
         super().__init__(message)
         self.message = message
@@ -41,14 +41,15 @@ class ParamsError(Exception):
 
 def load_config(filename: str) -> None:
     """
-        Read the configuration file and load its values into the Config model.
+        Reads the configuration file and loads its values
+        into the Config model.
 
         Args:
-            filename (str): Name of the file to open and read.
+            filename: Name of the file to open and read.
 
         Raises:
             ValueError: If the syntax of the config file is not "key=value".
-            InvalidConfigError: If the model attributes are incorrect.
+            InvalidConfigError: If the configuration fails model validation.
     """
     data: dict[str, Any] = {}
     with open(filename, "r") as config_file:
@@ -77,6 +78,9 @@ def load_config(filename: str) -> None:
 
 
 def main() -> None:
+    """
+        Run the main program.
+    """
     try:
         args = sys.argv
         if len(args) == 1:
