@@ -49,16 +49,12 @@ class ParamsError(Exception):
     """
     Exception raised when the parameters are invalid.
     """
-    def __init__(
-        self,
-        message: str = "[ERROR] Program should have the correct parameters"
-    ) -> None:
+    def __init__(self, message: str) -> None:
         """
             Initialize the exception with an error message.
 
             Args:
-                message: Error message to raise. Defaults to the
-                standard parameter error message.
+                message: Error message to raise.
         """
         super().__init__(message)
         self.message = message
