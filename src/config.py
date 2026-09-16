@@ -31,6 +31,8 @@ class Config(BaseModel):
     def config_validation_rules(self) -> "Config":
         """
         Validate the entry and exit coordinates against the maze dimensions.
+        Check if the entry is the same cell as the exit.
+        Check if the entry or the exit are in the border of the maze.
         """
         if (self.entry[0] > self.width):
             raise ValueError("Entry out of bounds")
@@ -40,4 +42,10 @@ class Config(BaseModel):
             raise ValueError("Exit out of bounds")
         if (self.exit[1] > self.height):
             raise ValueError("Exit out of bounds")
+        if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
+            raise ValueError("Entry and exit cannot be the same cell")
+        if (self.entry[0] == 0 or self.entry[0] == self.width or self.entry[1] == 0 or self.entry[1] == self.height):
+            raise ValueError("Entry cannot be at the border of the maze")
+        if (self.exit[0] == 0 or self.exit[0] == self.width or self.exit[1] == 0 or self.exit[1] == self.height):
+            raise ValueError("Exit cannot be at the border of the maze")
         return self

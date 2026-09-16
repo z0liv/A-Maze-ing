@@ -1,5 +1,6 @@
 import sys
 from .config import Config
+from .errors import InvalidConfigError, ParamsError
 from typing import Any
 from pydantic import ValidationError
 
@@ -48,40 +49,12 @@ class MazeGenerator:
 
         We do the config file parsing here.
         """
-        self.config = load_config_model()
-        self.entry = Cell((0, 0), 15, True)
-        self.exit = Cell((self.config.height, self.config.width), 15, True)
-
-
-class InvalidConfigError(Exception):
-    """
-    Exception raised when the configuration is invalid.
-    """
-    def __init__(self, messages: list[str]) -> None:
-        """
-            Initialize the exception with a list of error messages.
-
-            Args:
-                messages: List of one or more error messages.
-        """
-        prefix: str = "[ERROR] Invalid configuration: "
-        super().__init__(prefix + "\n{}".format("\n".join(messages)))
-        self.messages = messages
-
-
-class ParamsError(Exception):
-    """
-    Exception raised when the parameters are invalid.
-    """
-    def __init__(self, message: str) -> None:
-        """
-            Initialize the exception with an error message.
-
-            Args:
-                message: Error message to raise.
-        """
-        super().__init__(message)
-        self.message = message
+        try:
+            self.config = load_config_model()
+            self.entry = Cell(self.config.entry, 15, True)
+            self.exit = Cell(self.config.exit, 15, True)
+        except InvalidConfigError as error:
+            print("[ERROR]", error)
 
 
 def validate_params() -> str:
@@ -105,9 +78,6 @@ def validate_params() -> str:
                 prefix + f"expected 1 received {len(args) - 1}"
                 )
         return args[1]
-    except InvalidConfigError as error:
-        print("[ERROR]", error)
-        raise
     except ParamsError as error:
         print("[ERROR]", error)
         raise
@@ -151,5 +121,5 @@ def load_config_model() -> Config:
     except ValidationError as val:
         errors: list[str] = []
         for error in val.errors():
-            errors.append(str(error.get("loc")[0]) + ": " + error.get("msg"))
+            errors.append(error.get("msg"))
         raise InvalidConfigError(errors)
