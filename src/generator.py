@@ -19,14 +19,14 @@ class Cell:
 
     def __init__(
             self, position: tuple[int, int],
-            walls: int, in_solution: bool
+            walls: int, visited: bool
     ) -> None:
         """
         Initialize the cell with the attributes defined previously.
         """
         self.position = position
         self.walls = walls
-        self.visited = in_solution
+        self.visited = visited
 
 
 class MazeGenerator:
