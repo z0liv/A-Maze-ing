@@ -121,5 +121,8 @@ def load_config_model() -> Config:
     except ValidationError as val:
         errors: list[str] = []
         for error in val.errors():
-            errors.append(error.get("msg"))
+            if len(error.get("loc")) != 0:
+                errors.append(str(error.get("loc")[0]) + ": " + error.get("msg"))
+            else:
+                errors.append(error.get("msg"))
         raise InvalidConfigError(errors)
