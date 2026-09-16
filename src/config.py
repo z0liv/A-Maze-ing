@@ -34,18 +34,25 @@ class Config(BaseModel):
         Check if the entry is the same cell as the exit.
         Check if the entry or the exit are in the border of the maze.
         """
+        if (self.output_file == ""):
+            self.output_file = "maze.txt"
+            print("Output file cannot be empty, using default 'maze.txt'.")
         if (self.entry[0] > self.width):
-            raise ValueError("Entry out of bounds")
+            raise ValueError("Entry out of bounds.")
         if (self.entry[1] > self.height):
-            raise ValueError("Entry out of bounds")
+            raise ValueError("Entry out of bounds.")
         if (self.exit[0] > self.width):
-            raise ValueError("Exit out of bounds")
+            raise ValueError("Exit out of bounds.")
         if (self.exit[1] > self.height):
-            raise ValueError("Exit out of bounds")
+            raise ValueError("Exit out of bounds.")
         if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
-            raise ValueError("Entry and exit cannot be the same cell")
-        if (self.entry[0] == 0 or self.entry[0] == self.width or self.entry[1] == 0 or self.entry[1] == self.height):
-            raise ValueError("Entry cannot be at the border of the maze")
-        if (self.exit[0] == 0 or self.exit[0] == self.width or self.exit[1] == 0 or self.exit[1] == self.height):
-            raise ValueError("Exit cannot be at the border of the maze")
+            raise ValueError("Entry and exit cannot be the same cell.")
+        if (self.entry[0] == 0 or self.entry[0] == self.width):
+            raise ValueError("Entry cannot be at the border of the maze.")
+        if (self.entry[1] == 0 or self.entry[1] == self.height):
+            raise ValueError("Entry cannot be at the border of the maze.")
+        if (self.exit[0] == 0 or self.exit[0] == self.width):
+            raise ValueError("Exit cannot be at the border of the maze.")
+        if (self.exit[1] == 0 or self.exit[1] == self.height):
+            raise ValueError("Exit cannot be at the border of the maze.")
         return self

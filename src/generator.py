@@ -10,9 +10,11 @@ class Cell:
     Class that represents each cell of the maze.
 
     Attributes:
-        position (tuple[int, int]): Defines de location of the cell in a tuple of x, y coordinates.
+        position (tuple[int, int]): Defines the location of the cell in a tuple
+                                    of x, y coordinates.
         walls: (int): A integer that determines which walls are present.
-        visited: (bool): A boolean that tells if the cell is part of the solution(s).
+        visited: (bool): A boolean that tells if
+                         the cell is part of the solution(s).
     """
     position: tuple[int, int]
     walls: int
@@ -97,7 +99,10 @@ def load_config_model() -> Config:
         with open(filename, "r") as config_file:
             for line in config_file:
                 line = line.strip()
-                if line[0] == "#":
+                if len(line) > 0:
+                    if line[0] == "#":
+                        continue
+                else:
                     continue
                 try:
                     key, value = line.split("=", 1)
@@ -107,15 +112,19 @@ def load_config_model() -> Config:
                     else:
                         data[key.lower()] = value
                 except ValueError:
-                    prefix: str = "[ERROR] Config lines in 'config.txt'"
-                    raise ValueError(prefix + " must be 'key=value' syntax")
+                    prefix: str = "[ERROR] The configuration file"
+                    raise ValueError(prefix + " must have 'key=value' syntax")
         config_model: Config = Config(**data)
         return config_model
     except ValidationError as val:
         errors: list[str] = []
         for error in val.errors():
-            if len(error.get("loc")) != 0:
-                errors.append(str(error.get("loc")[0]) + ": " + error.get("msg"))
+            if len(error.get("loc")) != 0 and error.get("type") == "missing":
+                prefix = error.get("msg") + ": '"
+                errors.append(prefix + str(error.get("loc")[0]).upper() + "'")
+            elif len(error.get("loc")) != 0:
+                prefix = "'" + str(error.get("loc")[0]).upper()
+                errors.append(prefix + "' " + error.get("msg"))
             else:
                 errors.append(error.get("msg"))
         raise InvalidConfigError(errors)
