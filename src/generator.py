@@ -5,25 +5,49 @@ from pydantic import ValidationError
 
 
 class Cell:
+    """
+    Class that represents each cell of the maze.
+
+    Attributes:
+        position (tuple[int, int]): Defines de location of the cell in a tuple of x, y coordinates.
+        walls: (int): A integer that determines which walls are present.
+        visited: (bool): A boolean that tells if the cell is part of the solution(s).
+    """
     position: tuple[int, int]
     walls: int
-    in_solution: bool
+    visited: bool
 
     def __init__(
             self, position: tuple[int, int],
             walls: int, in_solution: bool
     ) -> None:
+        """
+        Initialize the cell with the attributes defined previously.
+        """
         self.position = position
         self.walls = walls
-        self.in_solution = in_solution
+        self.visited = in_solution
 
 
 class MazeGenerator:
+    """
+    Class that will generate the maze.
+
+    Attributes:
+        config (Config): It stores all the info gathered from the config file.
+        entry: (Cell): Indicates which cell is the entrance of the maze.
+        exit: (Cell): Indicates which cell is the exit of the maze.
+    """
     config: Config
     entry: Cell
     exit: Cell
 
     def __init__(self) -> None:
+        """
+        Initialize the maze.
+
+        We do the config file parsing here.
+        """
         self.config = load_config_model()
         self.entry = Cell((0, 0), 15, True)
         self.exit = Cell((self.config.height, self.config.width), 15, True)
