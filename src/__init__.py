@@ -1,5 +1,6 @@
-"""Expose the Config model and Maze generator as part of the package public API."""
-from .config import Config
+"""
+Expose the Config model and Maze generator as part of the package public API.
+"""
 from .generator import MazeGenerator
 
-__all__ = ["Config", "MazeGenerator"]
+__all__ = ["MazeGenerator"]

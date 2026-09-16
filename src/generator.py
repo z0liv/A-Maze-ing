@@ -1,18 +1,22 @@
 import sys
+from .config import Config
 from typing import Any
 from pydantic import ValidationError
-from src.config import Config
+
 
 class Cell:
     position: tuple[int, int]
     walls: int
     in_solution: bool
 
-    def __init__(self, position: tuple[int, int],
-                 walls:int, in_solution: bool) -> None:
+    def __init__(
+            self, position: tuple[int, int],
+            walls: int, in_solution: bool
+    ) -> None:
         self.position = position
         self.walls = walls
         self.in_solution = in_solution
+
 
 class MazeGenerator:
     config: Config
@@ -20,9 +24,10 @@ class MazeGenerator:
     exit: Cell
 
     def __init__(self) -> None:
-        self.config = load_config_txt()
+        self.config = load_config_model()
         self.entry = Cell((0, 0), 15, True)
         self.exit = Cell((self.config.height, self.config.width), 15, True)
+
 
 class InvalidConfigError(Exception):
     """
@@ -58,27 +63,33 @@ class ParamsError(Exception):
         super().__init__(message)
         self.message = message
 
-def load_config_txt() -> Config:
+
+def validate_params() -> str:
     """
-        Extract the name of the config file and call de 
-        fucntion that loads the model given such .txt file.
+        Validate that there is the correct number of params.
+
+        Returns:
+            The filename extracted from the sys.argv.
+        Raises:
+            ParamsError: If the number of params is equal to 1 or
+                is greater than 2.
     """
     try:
         args = sys.argv
         if len(args) == 1:
-            prefix = "[ERROR] Missing config file"
+            prefix = "Missing config file"
             raise ParamsError(prefix + ", expected 'config.txt'")
         elif len(args) > 2:
-            prefix = "[ERROR] Too many params, "
+            prefix = "Too many params, "
             raise ParamsError(
                 prefix + f"expected 1 received {len(args) - 1}"
                 )
-        return load_config_model(args[1])
+        return args[1]
     except InvalidConfigError as error:
-        print(error)
+        print("[ERROR]", error)
         raise
     except ParamsError as error:
-        print(error)
+        print("[ERROR]", error)
         raise
     except FileNotFoundError as error:
         print("[ERROR]", error)
@@ -87,18 +98,17 @@ def load_config_txt() -> Config:
         print("[ERROR]", error)
         raise
 
-def load_config_model(filename: str) -> Config:
+
+def load_config_model() -> Config:
     """
         Reads the configuration file and loads its values
         into the Config model.
-
-        Args:
-            filename: Name of the file to open and read.
 
         Raises:
             ValueError: If the syntax of the config file is not "key=value".
             InvalidConfigError: If the configuration fails model validation.
     """
+    filename = validate_params()
     data: dict[str, Any] = {}
     with open(filename, "r") as config_file:
         for line in config_file:
