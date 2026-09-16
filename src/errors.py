@@ -9,8 +9,8 @@ class InvalidConfigError(Exception):
             Args:
                 messages: List of one or more error messages.
         """
-        prefix: str = "[ERROR] Invalid configuration: "
-        super().__init__(prefix + "\n{}".format("\n".join(messages)))
+        prefix: str = "Invalid configuration: "
+        super().__init__(prefix + "{}\n".format("\n".join(messages)))
         self.messages = messages
 
 

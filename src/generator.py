@@ -53,8 +53,8 @@ class MazeGenerator:
             self.config = load_config_model()
             self.entry = Cell(self.config.entry, 15, True)
             self.exit = Cell(self.config.exit, 15, True)
-        except InvalidConfigError as error:
-            print("[ERROR]", error)
+        except Exception:
+            raise
 
 
 def validate_params() -> str:
@@ -78,14 +78,7 @@ def validate_params() -> str:
                 prefix + f"expected 1 received {len(args) - 1}"
                 )
         return args[1]
-    except ParamsError as error:
-        print("[ERROR]", error)
-        raise
-    except FileNotFoundError as error:
-        print("[ERROR]", error)
-        raise
-    except ValueError as error:
-        print("[ERROR]", error)
+    except Exception:
         raise
 
 
@@ -98,24 +91,24 @@ def load_config_model() -> Config:
             ValueError: If the syntax of the config file is not "key=value".
             InvalidConfigError: If the configuration fails model validation.
     """
-    filename = validate_params()
-    data: dict[str, Any] = {}
-    with open(filename, "r") as config_file:
-        for line in config_file:
-            line = line.strip()
-            if line[0] == "#":
-                continue
-            try:
-                key, value = line.split("=", 1)
-                if (key.lower() == "entry" or key.lower() == "exit"):
-                    lst_value = (value.split(","))
-                    data[key.lower()] = lst_value
-                else:
-                    data[key.lower()] = value
-            except ValueError:
-                prefix: str = "[ERROR] Config lines in 'config.txt'"
-                raise ValueError(prefix + " must be 'key=value' syntax")
     try:
+        filename = validate_params()
+        data: dict[str, Any] = {}
+        with open(filename, "r") as config_file:
+            for line in config_file:
+                line = line.strip()
+                if line[0] == "#":
+                    continue
+                try:
+                    key, value = line.split("=", 1)
+                    if (key.lower() == "entry" or key.lower() == "exit"):
+                        lst_value = (value.split(","))
+                        data[key.lower()] = lst_value
+                    else:
+                        data[key.lower()] = value
+                except ValueError:
+                    prefix: str = "[ERROR] Config lines in 'config.txt'"
+                    raise ValueError(prefix + " must be 'key=value' syntax")
         config_model: Config = Config(**data)
         return config_model
     except ValidationError as val:
