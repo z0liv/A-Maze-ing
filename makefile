@@ -20,6 +20,7 @@ debug:
 
 install: requirements.txt
 	$(PYTHON) -m pip install -r requirements.txt
+	$(PYTHON) -m pip install mlx-2.4-py3-none-any.whl
 
 lint: 
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)

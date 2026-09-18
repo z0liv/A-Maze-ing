@@ -54,7 +54,6 @@ class MazeGenerator:
         self.config = load_config_model()
         self.entry = Cell(self.config.entry, 15, True)
         self.exit = Cell(self.config.exit, 15, True)
-        
 
 
 def validate_params() -> str:
