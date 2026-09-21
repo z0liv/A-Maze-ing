@@ -65,6 +65,7 @@ class MazeGenerator:
 
         self.entry.visited = True
 
+
 def generate_grid(config: Config) -> list[list[Cell]]:
     """
         Generate the grid of cells that will be used to create the maze.
@@ -84,6 +85,7 @@ def generate_grid(config: Config) -> list[list[Cell]]:
             row.append(cell)
         grid.append(row)
     return grid
+
 
 def get_neighbors(cell: Cell, grid: list[list[Cell]]) -> list[tuple[Cell, DIRECTION]]:
     """
@@ -158,6 +160,7 @@ def opposite(direction: DIRECTION) -> DIRECTION:
         return DIRECTION.EAST
     else:
         raise ValueError("Invalid direction")
+
 
 def validate_params() -> str:
     """
