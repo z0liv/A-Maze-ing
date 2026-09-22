@@ -1,6 +1,6 @@
 from src.generator import MazeGenerator, generate_maze_ab
 from src.errors import ParamsError, InvalidConfigError
-from src.mlx_test import generate_view
+from src.rendering import View
 
 
 def main() -> None:
@@ -9,7 +9,8 @@ def main() -> None:
         if hasattr(maze_generator, "config"):
             print(maze_generator.config)
         generate_maze_ab(maze_generator)
-        generate_view(maze_generator.grid)
+        view = View(2000, 2000, 8000, 40, 2)
+        view.generate_view(maze_generator.grid)
         for row in maze_generator.grid:
             for cell in row:
                 print(cell.position, cell.walls, cell.visited)
