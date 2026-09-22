@@ -5,8 +5,14 @@ import os
 
 
 class View:
-    def __init__(self, window_width: int, window_height: int, size_line:int,
-                 cell_size: int, wall_size: int) -> None:
+    def __init__(
+            self,
+            window_width: int,
+            window_height: int,
+            size_line: int,
+            cell_size: int,
+            wall_size: int
+    ) -> None:
         self.window_width = window_width
         self.window_height = window_height
         self.size_line = size_line
@@ -16,7 +22,13 @@ class View:
     def offset(self, x: int, y: int, size_line: int) -> int:
         return y * size_line + x * 4
 
-    def generate_cell(self, data: Any, x: int, y:int, size_line: int) -> None:
+    def generate_cell(
+            self,
+            data: Any,
+            x: int,
+            y: int,
+            size_line: int
+    ) -> None:
         for i in range(60):
             for j in range(60):
                 if (i < 4 or i >= 58 or j < 4 or j >= 58):
@@ -25,17 +37,24 @@ class View:
                     start = self.offset(px, py, size_line)
                     data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
-
     def generate_view(self, grid: list[list[Cell]]) -> None:
         mlx = Mlx()
         mlx_ptr = mlx.mlx_init()
-        win_ptr = mlx.mlx_new_window(mlx_ptr, self.window_width, self.window_height, "window")
+        win_ptr = mlx.mlx_new_window(
+            mlx_ptr,
+            self.window_width,
+            self.window_height,
+            "A-Maze-ing")
         mlx.mlx_clear_window(mlx_ptr, win_ptr)
         img_ptr = mlx.mlx_new_image(mlx_ptr, 2000, 2000)
         data, _, size_line, _ = mlx.mlx_get_data_addr(img_ptr)
         for row in grid:
             for cell in row:
-                self.generate_cell(data, grid.index(row), row.index(cell), size_line)
+                self.generate_cell(
+                    data,
+                    grid.index(row),
+                    row.index(cell),
+                    size_line)
         mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, 0, 0)
 
         def on_key(keynum: int, mystuff: Any) -> None:
