@@ -87,7 +87,10 @@ def generate_grid(config: Config) -> list[list[Cell]]:
     return grid
 
 
-def get_neighbors(cell: Cell, grid: list[list[Cell]]) -> list[tuple[Cell, DIRECTION]]:
+def get_neighbors(
+        cell: Cell,
+        grid: list[list[Cell]]
+) -> list[tuple[Cell, DIRECTION]]:
     """
         Get the neighbors of a given cell in the grid.
 
@@ -145,7 +148,8 @@ def opposite(direction: DIRECTION) -> DIRECTION:
         Get the opposite direction of a given direction.
 
         Args:
-            direction (DIRECTION): The direction for which to find the opposite.
+            direction (DIRECTION): The direction for which
+            to find the opposite.
 
         Returns:
             The opposite DIRECTION.
