@@ -29,9 +29,8 @@ lint-strict:
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY_STRICT) 
 
 clean:
-	rm -rf __pycache__ .mypy_cache
-	rm -rf src/__pycache__
 	rm -rf .venv
+	find . -type d \( -name "__pycache__" -o -name ".mypy_cache" \) -exec rm -rf {} +
 
 create-venv:
 	python3 -m venv .venv

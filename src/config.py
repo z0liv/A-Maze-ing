@@ -1,5 +1,10 @@
-from pydantic import BaseModel, Field, model_validator
-from typing import Annotated
+import sys
+from pydantic import (BaseModel,
+                      ValidationError,
+                      Field,
+                      model_validator)
+from typing import Annotated, Any
+from .errors import InvalidConfigError, ParamsError
 
 
 class Config(BaseModel):
@@ -56,3 +61,74 @@ class Config(BaseModel):
         if (self.exit[1] == 0 or self.exit[1] == self.height):
             raise ValueError("Exit cannot be at the border of the maze.")
         return self
+
+
+def validate_params() -> str:
+    """
+        Validate that there is the correct number of params.
+
+        Returns:
+            The filename extracted from the sys.argv.
+        Raises:
+            ParamsError: If the number of params is equal to 1 or
+                is greater than 2.
+    """
+    try:
+        args = sys.argv
+        if len(args) == 1:
+            prefix = "Missing config file"
+            raise ParamsError(prefix + ", expected 'config.txt'")
+        elif len(args) > 2:
+            prefix = "Too many params, "
+            raise ParamsError(
+                prefix + f"expected 1 received {len(args) - 1}"
+                )
+        return args[1]
+    except Exception:
+        raise
+
+
+def load_config_model() -> Config:
+    """
+        Reads the configuration file and loads its values
+        into the Config model.
+
+        Raises:
+            ValueError: If the syntax of the config file is not "key=value".
+            InvalidConfigError: If the configuration fails model validation.
+    """
+    try:
+        filename = validate_params()
+        data: dict[str, Any] = {}
+        with open(filename, "r") as config_file:
+            for line in config_file:
+                line = line.strip()
+                if len(line) > 0:
+                    if line[0] == "#":
+                        continue
+                else:
+                    continue
+                try:
+                    key, value = line.split("=", 1)
+                    if (key.lower() == "entry" or key.lower() == "exit"):
+                        lst_value = (value.split(","))
+                        data[key.lower()] = lst_value
+                    else:
+                        data[key.lower()] = value
+                except ValueError:
+                    prefix: str = "[ERROR] The configuration file"
+                    raise ValueError(prefix + " must have 'key=value' syntax")
+        config_model: Config = Config(**data)
+        return config_model
+    except ValidationError as val:
+        errors: list[str] = []
+        for error in val.errors():
+            if len(error.get("loc")) != 0 and error.get("type") == "missing":
+                prefix = error.get("msg") + ": '"
+                errors.append(prefix + str(error.get("loc")[0]).upper() + "'")
+            elif len(error.get("loc")) != 0:
+                prefix = "'" + str(error.get("loc")[0]).upper()
+                errors.append(prefix + "' " + error.get("msg"))
+            else:
+                errors.append(error.get("msg"))
+        raise InvalidConfigError(errors)

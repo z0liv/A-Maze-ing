@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from .generator import Cell
 from mlx import Mlx
 from typing import Any
@@ -9,7 +7,8 @@ import os
 def offset(x: int, y: int, size_line: int) -> int:
     return y * size_line + x * 4
 
-def generate_cell(data, x: int, y:int, size_line: int) -> None:
+
+def generate_cell(data: Any, x: int, y: int, size_line: int) -> None:
     for i in range(60):
         for j in range(60):
             if (i < 4 or i >= 58 or j < 4 or j >= 58):
@@ -22,7 +21,7 @@ def generate_cell(data, x: int, y:int, size_line: int) -> None:
 def generate_view(grid: list[list[Cell]]) -> None:
     mlx = Mlx()
     mlx_ptr = mlx.mlx_init()
-    win_ptr = mlx.mlx_new_window(mlx_ptr, 2000, 2000, "window")
+    win_ptr = mlx.mlx_new_window(mlx_ptr, 2000, 2000, "A-Maze-ing")
     mlx.mlx_clear_window(mlx_ptr, win_ptr)
     img_ptr = mlx.mlx_new_image(mlx_ptr, 2000, 2000)
     data, bpp, size_line, fmt = mlx.mlx_get_data_addr(img_ptr)

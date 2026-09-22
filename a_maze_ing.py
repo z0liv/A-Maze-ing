@@ -1,6 +1,7 @@
-from src.generator import MazeGenerator, generate_maze_ab
+from src.generator import MazeGenerator
 from src.errors import ParamsError, InvalidConfigError
-from src.mlx_test import generate_view
+from src.rendering import generate_view
+from src.algorithms import generate_maze_ab
 
 
 def main() -> None:
