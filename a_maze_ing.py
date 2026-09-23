@@ -6,7 +6,7 @@ from src.rendering import View
 
 def main() -> None:
     try:
-        margin: int = 50
+        margin: int = 150
         cell_size: int = 50
         wall_size: int = 4
 
@@ -15,6 +15,7 @@ def main() -> None:
         view = View(mazegen.config.width * cell_size + margin,
                     mazegen.config.height * cell_size + margin,
                     cell_size,
+                    margin,
                     wall_size,
                     mazegen.grid)
         view.generate_view()
