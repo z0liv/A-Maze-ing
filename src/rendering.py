@@ -36,6 +36,7 @@ class View:
     def generate_view(self) -> None:
         image_data, size_line, mlx, ptr = self.initialize_image()
         self.draw_complete_grid(image_data, size_line)
+        self.write_options(mlx, ptr)
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
@@ -83,6 +84,26 @@ class View:
         data, _, size_line, _ = mlx.mlx_get_data_addr(img_ptr)
         ptr = (mlx_ptr, win_ptr, img_ptr)
         return data, size_line, mlx, ptr
+
+
+    def write_options(self, mlx: Mlx, ptr: tuple[int | None, ...]) -> None:
+        options: list[str] = [
+            "=== A-Maze-ing ===",
+            "1. Re-generate a new maze",
+            "2. Show / Hide the shortest path",
+            "3. Rotate the wall colours",
+            "4. Quit",
+        ]
+        i: float = 5
+        for opt in options:
+            mlx.mlx_string_put(ptr[0],
+                           ptr[1],
+                           int(self.margin / 2),
+                           self.window_height - (self.cell_size * i),
+                           0xFFFFFFFF,
+                           opt)
+            i -= 1
+
 
     def show_image(self, mlx: Mlx,
                    ptr: tuple[int | None, int | None, int | None]) -> None:
