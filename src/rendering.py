@@ -40,17 +40,20 @@ class View:
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
+        wall_size: int = self.wall_size
         for row in self.grid:
             for cell in row:
                 for i in range(self.cell_size):
                     for j in range(self.cell_size):
-                        if ((self.grid.index(row) == 0 and i <= 8)
-                            or (self.grid.index(row) == len(self.grid) - 1 and i >= 42)
-                            or (row.index(cell) == 0 and j <= 8)
-                            or (row.index(cell) == len(row) - 1 and j >= 42)):
-                            self.wall_size = 8
+                        if ((self.grid.index(row) == 0 and i <= wall_size * 2)
+                            or (self.grid.index(row) == len(self.grid) - 1 and i >= self.cell_size - wall_size * 2)
+                            or (row.index(cell) == 0 and j <= wall_size * 2)
+                            or (row.index(cell) == len(row) - 1 and j >= self.cell_size - wall_size * 2)):
+                            if (self.wall_size == wall_size):
+                                self.wall_size *= 2
                         else:
-                            self.wall_size = 4
+                            if (self.wall_size != wall_size):
+                                self.wall_size = wall_size
                         if (i <= self.wall_size
                             or i >= self.cell_size - self.wall_size
                             or j <= self.wall_size
