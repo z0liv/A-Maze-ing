@@ -10,17 +10,30 @@ class View:
             window_width: int,
             window_height: int,
             cell_size: int,
-            wall_size: int
+            wall_size: int,
+            grid: list[list[Cell]]
     ) -> None:
         self.window_width = window_width
         self.window_height = window_height
         self.cell_size = cell_size
         self.wall_size = wall_size
+        self.grid = grid
 
-    def offset(self, x: int, y: int, size_line: int) -> int:
-        return y * size_line + x * 4
+    def generate_view(self) -> None:
+        image_data, size_line, mlx, ptr = self.initialize_image()
+        self.draw_complete_grid(image_data, size_line)
+        self.show_image(mlx, ptr)
 
-    def generate_cell(
+    def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
+        for row in self.grid:
+            for cell in row:
+                self.draw_cell(
+                    image_data,
+                    self.grid.index(row),
+                    row.index(cell),
+                    size_line)
+
+    def draw_cell(
             self,
             data: Any,
             x: int,
@@ -38,7 +51,12 @@ class View:
                     start = self.offset(px, py, size_line)
                     data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
-    def generate_view(self, grid: list[list[Cell]]) -> None:
+    def offset(self, x: int, y: int, size_line: int) -> int:
+        return y * size_line + x * 4
+
+    def initialize_image(self) -> tuple[Any, int, Mlx, tuple[int | None,
+                                                             int | None,
+                                                             int | None]]:
         mlx = Mlx()
         mlx_ptr = mlx.mlx_init()
         win_ptr = mlx.mlx_new_window(
@@ -49,22 +67,21 @@ class View:
         mlx.mlx_clear_window(mlx_ptr, win_ptr)
         img_ptr = mlx.mlx_new_image(mlx_ptr, 2000, 2000)
         data, _, size_line, _ = mlx.mlx_get_data_addr(img_ptr)
-        for row in grid:
-            for cell in row:
-                self.generate_cell(
-                    data,
-                    grid.index(row),
-                    row.index(cell),
-                    size_line)
-        mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, int(self.cell_size / 2), int(self.cell_size / 2))
+        ptr = (mlx_ptr, win_ptr, img_ptr)
+        return data, size_line, mlx, ptr
 
-        def on_key(keynum: int, mystuff: Any) -> None:
-            print(f"Got key {keynum}, and got my stuff back:")
+    def show_image(self, mlx: Mlx,
+                   ptr: tuple[int | None, int | None, int | None]) -> None:
+        mlx.mlx_put_image_to_window(ptr[0], ptr[1], ptr[2],
+                                    int(self.cell_size / 2),
+                                    int(self.cell_size / 2))
+
+        def on_key(keynum: int, _: Any) -> None:
+            print(f"Got key {keynum}")
             if keynum == 65307:
-                mlx.mlx_mouse_hook(win_ptr, None, None)
+                mlx.mlx_mouse_hook(ptr[1], None, None)
                 os._exit(0)
-                print(mystuff)
         stuff = [1, 2]
-        mlx.mlx_key_hook(win_ptr, on_key, stuff)
-        mlx.mlx_hook(win_ptr, 33, 0, lambda _: os._exit(0), None)
-        mlx.mlx_loop(mlx_ptr)
+        mlx.mlx_key_hook(ptr[1], on_key, stuff)
+        # mlx.mlx_hook(win_ptr, 33, 0, lambda _: os._exit(0), None)
+        mlx.mlx_loop(ptr[0])

@@ -10,9 +10,10 @@ def main() -> None:
         if hasattr(maze_generator, "config"):
             print(maze_generator.config)
         generate_maze_ab(maze_generator)
-        view = View(maze_generator.config.width * 50 + 50, # current margin = 25
-                    maze_generator.config.width * 50 + 50, 50, 4) # current cell size = 50
-        view.generate_view(maze_generator.grid)
+        view = View(maze_generator.config.width * 50 + 50,
+                    maze_generator.config.height * 50 + 50, 50, 4,
+                    maze_generator.grid)
+        view.generate_view()
         for row in maze_generator.grid:
             for cell in row:
                 print(cell.position, cell.walls, cell.visited)
