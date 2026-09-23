@@ -40,31 +40,28 @@ class View:
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
+        wall_size: int = self.wall_size
         for row in self.grid:
             for cell in row:
-                self.draw_cell(
-                    image_data,
-                    self.grid.index(row),
-                    row.index(cell),
-                    size_line)
-
-    def draw_cell(
-            self,
-            data: Any,
-            x: int,
-            y: int,
-            size_line: int
-    ) -> None:
-        for i in range(self.cell_size):
-            for j in range(self.cell_size):
-                if (i < self.wall_size
-                   or i >= self.cell_size - self.wall_size
-                   or j < self.wall_size
-                   or j >= self.cell_size - self.wall_size):
-                    px = x * self.cell_size + i
-                    py = y * self.cell_size + j
-                    start = self.offset(px, py, size_line)
-                    data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
+                for i in range(self.cell_size):
+                    for j in range(self.cell_size):
+                        if ((self.grid.index(row) == 0 and i <= wall_size * 2)
+                            or (self.grid.index(row) == len(self.grid) - 1 and i >= self.cell_size - wall_size * 2)
+                            or (row.index(cell) == 0 and j <= wall_size * 2)
+                            or (row.index(cell) == len(row) - 1 and j >= self.cell_size - wall_size * 2)):
+                            if (self.wall_size == wall_size):
+                                self.wall_size *= 2
+                        else:
+                            if (self.wall_size != wall_size):
+                                self.wall_size = wall_size
+                        if (i <= self.wall_size
+                            or i >= self.cell_size - self.wall_size
+                            or j <= self.wall_size
+                            or j >= self.cell_size - self.wall_size):
+                            px = self.grid.index(row) * self.cell_size + i
+                            py = row.index(cell) * self.cell_size + j
+                            start = self.offset(px, py, size_line)
+                            image_data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
     def offset(self, x: int, y: int, size_line: int) -> int:
         return y * size_line + x * 4
