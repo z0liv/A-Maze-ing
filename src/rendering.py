@@ -19,7 +19,7 @@ class View:
         self.wall_size = wall_size
         self.grid = grid
 
-    def key_handler(self,keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
+    def key_handler(self, keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
         if keycode == 49:
             print("Option 1 selected\nRe-generated a new maze")
         elif keycode == 50:
