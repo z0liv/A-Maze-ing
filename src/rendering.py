@@ -17,6 +17,18 @@ class View:
         self.cell_size = cell_size
         self.wall_size = wall_size
 
+    def key_handler(self,keycode: int, mlx: object, win_ptr: object) -> None:
+        if keycode == 49:
+            print("Option 1 selected\nRe-generated a new maze")
+        elif keycode == 50:
+            print("Option 2 selected\nShow / Hide the shortest path")
+        elif keycode == 51:
+            print("Option 3 selected\nRotate the wall colours")
+        elif keycode == 52:
+            print("Option 4 selected\nExit")
+            mlx.mlx_mouse_hook(win_ptr, None, None)
+            os._exit(0)
+
     def offset(self, x: int, y: int, size_line: int) -> int:
         return y * size_line + x * 4
 
@@ -58,13 +70,8 @@ class View:
                     size_line)
         mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, int(self.cell_size / 2), int(self.cell_size / 2))
 
-        def on_key(keynum: int, mystuff: Any) -> None:
-            print(f"Got key {keynum}, and got my stuff back:")
-            if keynum == 65307:
-                mlx.mlx_mouse_hook(win_ptr, None, None)
-                os._exit(0)
-                print(mystuff)
-        stuff = [1, 2]
-        mlx.mlx_key_hook(win_ptr, on_key, stuff)
+        def on_key(keynum: int, _: Any) -> None:
+            self.key_handler(keynum, mlx, win_ptr)
+        mlx.mlx_key_hook(win_ptr, on_key, _)
         mlx.mlx_hook(win_ptr, 33, 0, lambda _: os._exit(0), None)
         mlx.mlx_loop(mlx_ptr)
