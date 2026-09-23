@@ -89,7 +89,7 @@ class View:
                                     int(self.cell_size / 2))
 
         def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum, mlx, ptr[2])
+            self.key_handler(keynum, mlx, ptr[1])
         stuff = [1, 2]
         mlx.mlx_key_hook(ptr[1], on_key, stuff)
         # mlx.mlx_hook(ptr[1], 33, 0, lambda _: os._exit(0), None)
