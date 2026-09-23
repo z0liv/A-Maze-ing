@@ -9,13 +9,11 @@ class View:
             self,
             window_width: int,
             window_height: int,
-            size_line: int,
             cell_size: int,
             wall_size: int
     ) -> None:
         self.window_width = window_width
         self.window_height = window_height
-        self.size_line = size_line
         self.cell_size = cell_size
         self.wall_size = wall_size
 
@@ -29,11 +27,14 @@ class View:
             y: int,
             size_line: int
     ) -> None:
-        for i in range(60):
-            for j in range(60):
-                if (i < 4 or i >= 58 or j < 4 or j >= 58):
-                    px = x * 60 + i
-                    py = y * 60 + j
+        for i in range(self.cell_size):
+            for j in range(self.cell_size):
+                if (i < self.wall_size
+                   or i >= self.cell_size - self.wall_size
+                   or j < self.wall_size
+                   or j >= self.cell_size - self.wall_size):
+                    px = x * self.cell_size + i
+                    py = y * self.cell_size + j
                     start = self.offset(px, py, size_line)
                     data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
@@ -55,7 +56,7 @@ class View:
                     grid.index(row),
                     row.index(cell),
                     size_line)
-        mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, 0, 0)
+        mlx.mlx_put_image_to_window(mlx_ptr, win_ptr, img_ptr, int(self.cell_size / 2), int(self.cell_size / 2))
 
         def on_key(keynum: int, mystuff: Any) -> None:
             print(f"Got key {keynum}, and got my stuff back:")
