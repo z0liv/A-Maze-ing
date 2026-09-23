@@ -19,6 +19,18 @@ class View:
         self.wall_size = wall_size
         self.grid = grid
 
+    def key_handler(self,keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
+        if keycode == 49:
+            print("Option 1 selected\nRe-generated a new maze")
+        elif keycode == 50:
+            print("Option 2 selected\nShow / Hide the shortest path")
+        elif keycode == 51:
+            print("Option 3 selected\nRotate the wall colours")
+        elif keycode == 52:
+            print("Option 4 selected\nExit")
+            mlx.mlx_mouse_hook(win_ptr, None, None)
+            os._exit(0)
+
     def generate_view(self) -> None:
         image_data, size_line, mlx, ptr = self.initialize_image()
         self.draw_complete_grid(image_data, size_line)
@@ -77,11 +89,8 @@ class View:
                                     int(self.cell_size / 2))
 
         def on_key(keynum: int, _: Any) -> None:
-            print(f"Got key {keynum}")
-            if keynum == 65307:
-                mlx.mlx_mouse_hook(ptr[1], None, None)
-                os._exit(0)
+            self.key_handler(keynum, mlx, ptr[2])
         stuff = [1, 2]
         mlx.mlx_key_hook(ptr[1], on_key, stuff)
-        # mlx.mlx_hook(win_ptr, 33, 0, lambda _: os._exit(0), None)
+        # mlx.mlx_hook(ptr[1], 33, 0, lambda _: os._exit(0), None)
         mlx.mlx_loop(ptr[0])
