@@ -6,16 +6,18 @@ from src.rendering import View
 
 def main() -> None:
     try:
-        margin: int = 150
+        horizontal_margin: int = 100
+        vertical_margin: int = 350
         cell_size: int = 50
         wall_size: int = 4
 
         mazegen: MazeGenerator = MazeGenerator()
         generate_maze_ab(mazegen)
-        view = View(mazegen.config.width * cell_size + margin,
-                    mazegen.config.height * cell_size + margin,
+        view = View(mazegen.config.width * cell_size + horizontal_margin,
+                    mazegen.config.height * cell_size + vertical_margin,
                     cell_size,
-                    margin,
+                    horizontal_margin,
+                    vertical_margin,
                     wall_size,
                     mazegen.grid)
         view.generate_view()
