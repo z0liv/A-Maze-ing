@@ -10,16 +10,18 @@ class View:
             window_width: int,
             window_height: int,
             cell_size: int,
+            margin: int,
             wall_size: int,
             grid: list[list[Cell]]
     ) -> None:
         self.window_width = window_width
         self.window_height = window_height
         self.cell_size = cell_size
+        self.margin = margin
         self.wall_size = wall_size
         self.grid = grid
 
-    def key_handler(self,keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
+    def key_handler(self, keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
         if keycode == 49:
             print("Option 1 selected\nRe-generated a new maze")
         elif keycode == 50:
@@ -80,8 +82,8 @@ class View:
     def show_image(self, mlx: Mlx,
                    ptr: tuple[int | None, int | None, int | None]) -> None:
         mlx.mlx_put_image_to_window(ptr[0], ptr[1], ptr[2],
-                                    int(self.cell_size / 2),
-                                    int(self.cell_size / 2))
+                                    int(self.margin / 2),
+                                    int(self.margin / 4))
 
         def on_key(keynum: int, _: Any) -> None:
             self.key_handler(keynum, mlx, ptr[1])

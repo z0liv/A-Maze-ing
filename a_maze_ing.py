@@ -6,17 +6,19 @@ from src.rendering import View
 
 def main() -> None:
     try:
-        maze_generator: MazeGenerator = MazeGenerator()
-        if hasattr(maze_generator, "config"):
-            print(maze_generator.config)
-        generate_maze_ab(maze_generator)
-        view = View(maze_generator.config.width * 50 + 50,
-                    maze_generator.config.height * 50 + 50, 50, 4,
-                    maze_generator.grid)
+        margin: int = 150
+        cell_size: int = 50
+        wall_size: int = 4
+
+        mazegen: MazeGenerator = MazeGenerator()
+        generate_maze_ab(mazegen)
+        view = View(mazegen.config.width * cell_size + margin,
+                    mazegen.config.height * cell_size + margin,
+                    cell_size,
+                    margin,
+                    wall_size,
+                    mazegen.grid)
         view.generate_view()
-        for row in maze_generator.grid:
-            for cell in row:
-                print(cell.position, cell.walls, cell.visited)
     except Exception as error:
         if isinstance(error, ParamsError):
             print("[ERROR]", error)
