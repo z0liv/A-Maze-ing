@@ -55,9 +55,11 @@ class View:
                                 and j >= self.cell_size - wall_size * 2)):
                             if (self.wall_size == wall_size):
                                 self.wall_size *= 2
-                        else:
-                            if (self.wall_size != wall_size):
-                                self.wall_size = wall_size
+                        if ((i <= self.wall_size and j <= self.wall_size)
+                            or (i >= self.cell_size - self.wall_size and j <= self.wall_size)
+                            or (i <= self.wall_size and j >= self.cell_size - self.wall_size)
+                            or (i >= self.cell_size - self.wall_size and j >= self.cell_size - self.wall_size)):
+                            self.draw_pixel(row, cell, i, j, image_data, size_line)
                         if (i <= self.wall_size and (cell.walls >> 0) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
                         if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
@@ -66,6 +68,8 @@ class View:
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
                         if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
+                        if (self.wall_size != wall_size):
+                            self.wall_size = wall_size
     def draw_pixel(self, row: list[Cell], cell: Cell, i: int, j: int, image_data: Any, size_line: int):
         py = self.grid.index(row) * self.cell_size + i
         px = row.index(cell) * self.cell_size + j

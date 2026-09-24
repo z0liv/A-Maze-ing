@@ -9,7 +9,7 @@ def main() -> None:
         horizontal_margin: int = 100
         vertical_margin: int = 350
         cell_size: int = 50
-        wall_size: int = 4
+        wall_size: int = 2
 
         mazegen: MazeGenerator = MazeGenerator()
         generate_maze_ab(mazegen)
