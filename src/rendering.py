@@ -67,8 +67,8 @@ class View:
                         if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
     def draw_pixel(self, row: list[Cell], cell: Cell, i: int, j: int, image_data: Any, size_line: int):
-        px = self.grid.index(row) * self.cell_size + i
-        py = row.index(cell) * self.cell_size + j
+        py = self.grid.index(row) * self.cell_size + i
+        px = row.index(cell) * self.cell_size + j
         start = self.offset(px, py, size_line)
         image_data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
