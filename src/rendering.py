@@ -48,9 +48,11 @@ class View:
                 for i in range(self.cell_size):
                     for j in range(self.cell_size):
                         if ((self.grid.index(row) == 0 and i <= wall_size * 2)
-                            or (self.grid.index(row) == len(self.grid) - 1 and i >= self.cell_size - wall_size * 2)
+                            or (self.grid.index(row) == len(self.grid) - 1
+                                and i >= self.cell_size - wall_size * 2)
                             or (row.index(cell) == 0 and j <= wall_size * 2)
-                            or (row.index(cell) == len(row) - 1 and j >= self.cell_size - wall_size * 2)):
+                            or (row.index(cell) == len(row) - 1
+                                and j >= self.cell_size - wall_size * 2)):
                             if (self.wall_size == wall_size):
                                 self.wall_size *= 2
                         else:
@@ -63,7 +65,10 @@ class View:
                             px = self.grid.index(row) * self.cell_size + i
                             py = row.index(cell) * self.cell_size + j
                             start = self.offset(px, py, size_line)
-                            image_data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
+                            image_data[start:start + 4] = bytes([0xFF,
+                                                                 0xFF,
+                                                                 0xFF,
+                                                                 0xFF])
 
     def offset(self, x: int, y: int, size_line: int) -> int:
         return y * size_line + x * 4
@@ -84,7 +89,6 @@ class View:
         ptr = (mlx_ptr, win_ptr, img_ptr)
         return data, size_line, mlx, ptr
 
-
     def write_options(self, mlx: Mlx, ptr: tuple[int | None, ...]) -> None:
         options: list[str] = [
             "=== A-Maze-ing ===",
@@ -96,13 +100,12 @@ class View:
         i: float = 5
         for opt in options:
             mlx.mlx_string_put(ptr[0],
-                           ptr[1],
-                           int(self.h_margin / 2),
-                           self.window_height - (self.cell_size * i),
-                           0xFFFFFFFF,
-                           opt)
+                               ptr[1],
+                               int(self.h_margin / 2),
+                               self.window_height - (self.cell_size * i),
+                               0xFFFFFFFF,
+                               opt)
             i -= 1
-
 
     def show_image(self, mlx: Mlx,
                    ptr: tuple[int | None, int | None, int | None]) -> None:
