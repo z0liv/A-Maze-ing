@@ -58,13 +58,13 @@ class View:
                         else:
                             if (self.wall_size != wall_size):
                                 self.wall_size = wall_size
-                        if (i <= self.wall_size and (cell.walls >> 3) & 1):
+                        if (i <= self.wall_size and (cell.walls >> 0) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (i >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
+                        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (j <= self.wall_size and (cell.walls >> 0) & 1):
+                        if (j <= self.wall_size and (cell.walls >> 3) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (j >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
+                        if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
     def draw_pixel(self, row: list[Cell], cell: Cell, i: int, j: int, image_data: Any, size_line: int):
         px = self.grid.index(row) * self.cell_size + i

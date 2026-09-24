@@ -21,8 +21,9 @@ def main() -> None:
                     wall_size,
                     mazegen.grid)
         for row in mazegen.grid:
+            print()
             for cell in row:
-                print(cell.position, bin(cell.walls), cell.visited)
+                print(hex(cell.walls).removeprefix("0x"), end="")
         view.generate_view()
     except Exception as error:
         if isinstance(error, ParamsError):
