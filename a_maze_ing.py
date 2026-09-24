@@ -20,6 +20,9 @@ def main() -> None:
                     vertical_margin,
                     wall_size,
                     mazegen.grid)
+        for row in mazegen.grid:
+            for cell in row:
+                print(cell.position, bin(cell.walls), cell.visited)
         view.generate_view()
     except Exception as error:
         if isinstance(error, ParamsError):
