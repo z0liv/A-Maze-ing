@@ -22,8 +22,8 @@ class Config(BaseModel):
             perfect (bool): Whether to generate a perfect or imperfect maze.
             seed (float): Seed used to generate a specific maze.
 """
-    width: int = Field(ge=0, le=80)
-    height: int = Field(ge=0, le=80)
+    width: int = Field(ge=0, le=35)
+    height: int = Field(ge=0, le=20)
     entry: tuple[Annotated[int, Field(ge=0, le=80)],
                  Annotated[int, Field(ge=0, le=80)]]
     exit: tuple[Annotated[int, Field(ge=0, le=80)],

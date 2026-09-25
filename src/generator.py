@@ -100,6 +100,7 @@ def define_pattern(grid: list[list[Cell]]) -> None:
         for cell in row:
             if cell.position in pattern_positions(center):
                 cell.is_pattern = True
+                cell.visited = True
 
 def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
     center: tuple[int, int]
