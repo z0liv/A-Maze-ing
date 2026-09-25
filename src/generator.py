@@ -15,10 +15,15 @@ class Cell:
     position: tuple[int, int]
     walls: int
     visited: bool
+    is_pattern: bool
+    is_entry: bool
+    is_exit: bool
 
     def __init__(
             self, position: tuple[int, int],
-            walls: int, visited: bool
+            walls: int, visited: bool,
+            is_pattern: bool, is_entry: bool,
+            is_exit: bool
     ) -> None:
         """
         Initialize the cell with the attributes defined previously.
@@ -26,6 +31,9 @@ class Cell:
         self.position = position
         self.walls = walls
         self.visited = visited
+        self.is_pattern = is_pattern
+        self.is_entry = is_entry
+        self.is_exit = is_exit
 
 
 class MazeGenerator:
@@ -75,7 +83,12 @@ def generate_grid(config: Config) -> list[list[Cell]]:
     for y in range(config.height):
         row: list[Cell] = []
         for x in range(config.width):
-            cell = Cell((x, y), 15, False)
+            if x == config.entry[0] and y == config.entry[1]:
+                cell = Cell((x, y), 15, False, False, True, False)
+            elif x == config.exit[0] and y == config.exit[1]:
+                cell = Cell((x, y), 15, False, False, False, True)
+            else:
+                cell = Cell((x, y), 15, False, False, False, False)
             row.append(cell)
         grid.append(row)
     return grid
