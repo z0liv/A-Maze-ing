@@ -42,7 +42,7 @@ class View:
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
-        wall_size: int = self.wall_size
+        wall_size = self.wall_size
         for row in self.grid:
             for cell in row:
                 for i in range(self.cell_size):

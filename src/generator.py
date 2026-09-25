@@ -58,6 +58,7 @@ class MazeGenerator:
         """
         self.config = load_config_model()
         self.grid = generate_grid(self.config)
+        define_pattern(self.grid)
 
         entry_x, entry_y = self.config.entry
         exit_x, exit_y = self.config.exit
@@ -92,3 +93,47 @@ def generate_grid(config: Config) -> list[list[Cell]]:
             row.append(cell)
         grid.append(row)
     return grid
+
+def define_pattern(grid: list[list[Cell]]) -> None:
+    center: tuple[int, int] = calculate_center(grid)
+    for row in grid:
+        for cell in row:
+            if cell.position in pattern_positions(center):
+                cell.is_pattern = True
+
+def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
+    center: tuple[int, int]
+    width: int = len(grid[0])
+    height: int = len(grid)
+    if height % 2 == 1 and width % 2 == 1:
+        center = (width // 2, height // 2)
+    elif height % 2 == 0 and width % 2 == 1:
+        center = (width // 2, height // 2 - 1)
+    elif height % 2 == 1 and width % 2 == 0:
+        center = (width // 2 - 1, height // 2)
+    else:
+        center = (width // 2 - 1, height // 2 - 1)
+    return center
+
+def pattern_positions(center: tuple[int, int]):
+    pattern_pos: list[tuple[int, int]] = [
+            (center[0] - 3, center[1] - 2),
+            (center[0] - 3, center[1] - 1),
+            (center[0] - 3, center[1] - 0),
+            (center[0] - 2, center[1] - 0),
+            (center[0] - 1, center[1] - 0),
+            (center[0] - 1, center[1] + 1),
+            (center[0] - 1, center[1] + 2),
+            (center[0] + 1, center[1] - 2),
+            (center[0] + 2, center[1] - 2),
+            (center[0] + 3, center[1] - 2),
+            (center[0] + 3, center[1] - 1),
+            (center[0] + 3, center[1] + 0),
+            (center[0] + 2, center[1] + 0),
+            (center[0] + 1, center[1] + 0),
+            (center[0] + 1, center[1] + 1),
+            (center[0] + 1, center[1] + 2),
+            (center[0] + 2, center[1] + 2),
+            (center[0] + 3, center[1] + 2)]
+    return pattern_pos
+    

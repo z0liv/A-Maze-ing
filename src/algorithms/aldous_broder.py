@@ -49,13 +49,14 @@ def generate_maze_ab(maze_generator: MazeGenerator) -> None:
     while visited_cells < total_cells:
         neighbors = get_neighbors(current_cell, maze_generator.grid)
         next_cell, direction = random.choice(neighbors)
-
+        if next_cell.is_pattern:
+            next_cell.visited = True
+            visited_cells += 1
         if not next_cell.visited:
             current_cell.walls &= ~direction.value
             next_cell.walls &= ~opposite(direction).value
             next_cell.visited = True
             visited_cells += 1
-
         current_cell = next_cell
 
 
