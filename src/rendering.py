@@ -70,7 +70,16 @@ class View:
                             self.draw_pixel(row, cell, i, j, image_data, size_line)
                         if (self.wall_size != wall_size):
                             self.wall_size = wall_size
-    def draw_pixel(self, row: list[Cell], cell: Cell, i: int, j: int, image_data: Any, size_line: int):
+
+    def draw_pixel(
+            self,
+            row: list[Cell],
+            cell: Cell,
+            i: int,
+            j: int,
+            image_data: Any,
+            size_line: int
+    ):
         py = self.grid.index(row) * self.cell_size + i
         px = row.index(cell) * self.cell_size + j
         start = self.offset(px, py, size_line)

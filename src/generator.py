@@ -94,6 +94,7 @@ def generate_grid(config: Config) -> list[list[Cell]]:
         grid.append(row)
     return grid
 
+
 def define_pattern(grid: list[list[Cell]]) -> None:
     center: tuple[int, int] = calculate_center(grid)
     for row in grid:
@@ -101,6 +102,7 @@ def define_pattern(grid: list[list[Cell]]) -> None:
             if cell.position in pattern_positions(center):
                 cell.is_pattern = True
                 cell.visited = True
+
 
 def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
     center: tuple[int, int]
@@ -115,6 +117,7 @@ def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
     else:
         center = (width // 2 - 1, height // 2 - 1)
     return center
+
 
 def pattern_positions(center: tuple[int, int]):
     pattern_pos: list[tuple[int, int]] = [
@@ -137,4 +140,3 @@ def pattern_positions(center: tuple[int, int]):
             (center[0] + 2, center[1] + 2),
             (center[0] + 3, center[1] + 2)]
     return pattern_pos
-    

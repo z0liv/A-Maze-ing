@@ -24,11 +24,11 @@ def main() -> None:
             print()
             for cell in row:
                 print("pos", cell.position, "\n",
-                      "walls" ,cell.walls, "\n",
+                      "walls", cell.walls, "\n",
                       "pattern", cell.is_pattern, "\n",
                       "entry", cell.is_entry, "\n",
                       "exit", cell.is_exit, "\n")
-                #print(hex(cell.walls).removeprefix("0x"), end="")
+                # print(hex(cell.walls).removeprefix("0x"), end="")
         view.generate_view()
     except Exception as error:
         if isinstance(error, ParamsError):

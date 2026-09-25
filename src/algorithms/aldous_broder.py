@@ -21,39 +21,50 @@ def get_neighbors(
     neighbors: list[tuple[Cell, DIRECTION]] = []
 
     # Check the four cardinal directions
-    if y > 0:  # North
+    if y > 0 and not grid[y - 1][x].is_pattern:  # North
         neighbors.append((grid[y - 1][x], DIRECTION.NORTH))
-    if x < len(grid[0]) - 1:  # East
+    if x < len(grid[0]) - 1 and not grid[y][x + 1].is_pattern:  # East
         neighbors.append((grid[y][x + 1], DIRECTION.EAST))
-    if y < len(grid) - 1:  # South
+    if y < len(grid) - 1 and not grid[y + 1][x].is_pattern:  # South
         neighbors.append((grid[y + 1][x], DIRECTION.SOUTH))
-    if x > 0:  # West
+    if x > 0 and not grid[y][x - 1].is_pattern:  # West
         neighbors.append((grid[y][x - 1], DIRECTION.WEST))
 
     return neighbors
 
 
-def generate_maze_ab(maze_generator: MazeGenerator) -> None:
+def get_free_cells(mazegen: MazeGenerator) -> int:
+    count: int = 0
+    for row in mazegen.grid:
+        for cell in row:
+            if not cell.is_pattern:
+                count += 1
+    return count
+
+
+def generate_maze_ab(mazegen: MazeGenerator) -> None:
     """
         Generate the maze using the Aldous-Broder algorithm.
 
         Args:
-            maze_generator (MazeGenerator): The maze generator instance.
+            mazegen (MazeGenerator): The maze generator instance.
     """
-    width = maze_generator.config.width
-    height = maze_generator.config.height
-    current_cell = maze_generator.entry
-    visited_cells = 19
-    total_cells = width * height
+    current_cell = mazegen.entry
+    visited_cells = 1
+    total_cells = get_free_cells(mazegen)
+
     while visited_cells < total_cells:
-        neighbors = get_neighbors(current_cell, maze_generator.grid)
+        neighbors = get_neighbors(current_cell, mazegen.grid)
         next_cell, direction = random.choice(neighbors)
+
         if not next_cell.visited:
             current_cell.walls &= ~direction.value
             next_cell.walls &= ~opposite(direction).value
             next_cell.visited = True
             visited_cells += 1
+
         current_cell = next_cell
+
 
 def opposite(direction: DIRECTION) -> DIRECTION:
     """
