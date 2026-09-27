@@ -20,7 +20,7 @@ def main() -> None:
                     vertical_margin,
                     wall_size,
                     mazegen.grid)
-        for row in mazegen.grid:
+        """ for row in mazegen.grid:
             print()
             for cell in row:
                 print("pos", cell.position, "\n",
@@ -28,7 +28,7 @@ def main() -> None:
                       "pattern", cell.is_pattern, "\n",
                       "entry", cell.is_entry, "\n",
                       "exit", cell.is_exit, "\n")
-                # print(hex(cell.walls).removeprefix("0x"), end="")
+                print(hex(cell.walls).removeprefix("0x"), end="") """
         view.generate_view()
     except Exception as error:
         if isinstance(error, ParamsError):

@@ -62,7 +62,7 @@ class View:
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j, image_data, size_line)
 
-        # define borders
+        # define maze borders
         top: bool = (self.grid.index(row) == 0 and i <= wall_size * 2)
         bottom: bool = (self.grid.index(row) == len(self.grid) - 1
                         and i >= self.cell_size - wall_size * 2)
@@ -78,25 +78,52 @@ class View:
         # if we are in a cell corner, draw
         start: int = self.wall_size
         end: int = self.cell_size - start
-        if (
-            (i <= start and j <= start)
-            or (i >= end and j <= start)
-            or (i <= start and j >= end)
-            or (i >= end and j >= end)
-        ):
-            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        if (i < start and j < start):
+            if (self.grid.index(row) > 0 and row.index(cell) > 0):
+                left_top_cell: Cell = self.grid[
+                    self.grid.index(row) - 1][row.index(cell) - 1]
+                if ((cell.walls >> 0) & 1 or (cell.walls >> 3) & 1
+                        or (left_top_cell.walls >> 1) & 1
+                        or (left_top_cell.walls >> 2) & 1):
+                    self.draw_pixel(row, cell, i, j, image_data, size_line)
+        elif (j >= end and i < start):
+            if (self.grid.index(row) > 0 and row.index(cell) < len(row) - 1):
+                right_top_cell: Cell = self.grid[
+                    self.grid.index(row) - 1][row.index(cell) + 1]
+                if ((cell.walls >> 0) & 1 or (cell.walls >> 1) & 1
+                        or (right_top_cell.walls >> 2) & 1
+                        or (right_top_cell.walls >> 3) & 1):
+                    self.draw_pixel(row, cell, i, j, image_data, size_line)
+        elif (j < start and i >= end):
+            if (row.index(cell) > 0
+                    and self.grid.index(row) < len(self.grid) - 1):
+                left_bottom_cell: Cell = self.grid[
+                    self.grid.index(row) + 1][row.index(cell) - 1]
+                if ((cell.walls >> 2) & 1 or (cell.walls >> 3) & 1
+                        or (left_bottom_cell.walls >> 0) & 1
+                        or (left_bottom_cell.walls >> 1) & 1):
+                    self.draw_pixel(row, cell, i, j, image_data, size_line)
+        elif (i >= end and j >= end):
+            if (self.grid.index(row) < len(self.grid) - 1
+                    and row.index(cell) < len(row) - 1):
+                rigth_bottom_cell: Cell = self.grid[
+                    self.grid.index(row) + 1][row.index(cell) + 1]
+                if ((cell.walls >> 2) & 1 or (cell.walls >> 1) & 1
+                        or (rigth_bottom_cell.walls >> 0) & 1
+                        or (rigth_bottom_cell.walls >> 3) & 1):
+                    self.draw_pixel(row, cell, i, j, image_data, size_line)
 
         # if we are in a cell wall and the wall is placed, draw
-        # left wall
-        if (i <= self.wall_size and (cell.walls >> 0) & 1):
-            self.draw_pixel(row, cell, i, j, image_data, size_line)
-        # right wall
-        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
-            self.draw_pixel(row, cell, i, j, image_data, size_line)
         # top wall
-        if (j <= self.wall_size and (cell.walls >> 3) & 1):
+        if (i < self.wall_size and (cell.walls >> 0) & 1):
             self.draw_pixel(row, cell, i, j, image_data, size_line)
         # bottom wall
+        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # left wall
+        if (j < self.wall_size and (cell.walls >> 3) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # right wall
         if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
             self.draw_pixel(row, cell, i, j, image_data, size_line)
         # restart wall size if altered
@@ -110,10 +137,10 @@ class View:
             i: int,
             j: int,
             image_data: Any,
-            size_line: int
+            size_line: int,
     ) -> None:
-        py = self.grid.index(row) * self.cell_size + i
         px = row.index(cell) * self.cell_size + j
+        py = self.grid.index(row) * self.cell_size + i
         start = self.offset(px, py, size_line)
         image_data[start:start + 4] = bytes([0xFF, 0xFF, 0xFF, 0xFF])
 
