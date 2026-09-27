@@ -42,34 +42,66 @@ class View:
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
-        wall_size = self.wall_size
         for row in self.grid:
             for cell in row:
                 for i in range(self.cell_size):
                     for j in range(self.cell_size):
-                        if ((self.grid.index(row) == 0 and i <= wall_size * 2)
-                            or (self.grid.index(row) == len(self.grid) - 1
-                                and i >= self.cell_size - wall_size * 2)
-                            or (row.index(cell) == 0 and j <= wall_size * 2)
-                            or (row.index(cell) == len(row) - 1
-                                and j >= self.cell_size - wall_size * 2)):
-                            if (self.wall_size == wall_size):
-                                self.wall_size *= 2
-                        if ((i <= self.wall_size and j <= self.wall_size)
-                            or (i >= self.cell_size - self.wall_size and j <= self.wall_size)
-                            or (i <= self.wall_size and j >= self.cell_size - self.wall_size)
-                            or (i >= self.cell_size - self.wall_size and j >= self.cell_size - self.wall_size)):
-                            self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (i <= self.wall_size and (cell.walls >> 0) & 1):
-                            self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
-                            self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (j <= self.wall_size and (cell.walls >> 3) & 1):
-                            self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
-                            self.draw_pixel(row, cell, i, j, image_data, size_line)
-                        if (self.wall_size != wall_size):
-                            self.wall_size = wall_size
+                        self.decide_if_pixel_is_drawn(
+                            row, cell, i, j, image_data, size_line)
+
+    def decide_if_pixel_is_drawn(
+        self,
+        row: list[Cell],
+        cell: Cell,
+        i: int,
+        j: int,
+        image_data: Any,
+        size_line: int
+    ) -> None:
+        wall_size: int = self.wall_size
+        if (cell.is_pattern):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+
+        # define borders
+        top: bool = (self.grid.index(row) == 0 and i <= wall_size * 2)
+        bottom: bool = (self.grid.index(row) == len(self.grid) - 1
+                        and i >= self.cell_size - wall_size * 2)
+        left: bool = (row.index(cell) == 0 and j <= wall_size * 2)
+        right: bool = (row.index(cell) == len(row) - 1
+                       and j >= self.cell_size - wall_size * 2)
+
+        # if we are in a border double the wall's thickness
+        if (top or bottom or left or right):
+            if (self.wall_size == wall_size):
+                self.wall_size *= 2
+
+        # if we are in a cell corner, draw
+        start: int = self.wall_size
+        end: int = self.cell_size - start
+        if (
+            (i <= start and j <= start)
+            or (i >= end and j <= start)
+            or (i <= start and j >= end)
+            or (i >= end and j >= end)
+        ):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+
+        # if we are in a cell wall and the wall is placed, draw
+        # left wall
+        if (i <= self.wall_size and (cell.walls >> 0) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # right wall
+        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # top wall
+        if (j <= self.wall_size and (cell.walls >> 3) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # bottom wall
+        if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
+            self.draw_pixel(row, cell, i, j, image_data, size_line)
+        # restart wall size if altered
+        if (self.wall_size != wall_size):
+            self.wall_size //= 2
 
     def draw_pixel(
             self,
@@ -79,7 +111,7 @@ class View:
             j: int,
             image_data: Any,
             size_line: int
-    ):
+    ) -> None:
         py = self.grid.index(row) * self.cell_size + i
         px = row.index(cell) * self.cell_size + j
         start = self.offset(px, py, size_line)

@@ -119,24 +119,12 @@ def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
     return center
 
 
-def pattern_positions(center: tuple[int, int]):
+def pattern_positions(center: tuple[int, int]) -> list[tuple[int, int]]:
+    x, y = center
     pattern_pos: list[tuple[int, int]] = [
-            (center[0] - 3, center[1] - 2),
-            (center[0] - 3, center[1] - 1),
-            (center[0] - 3, center[1] - 0),
-            (center[0] - 2, center[1] - 0),
-            (center[0] - 1, center[1] - 0),
-            (center[0] - 1, center[1] + 1),
-            (center[0] - 1, center[1] + 2),
-            (center[0] + 1, center[1] - 2),
-            (center[0] + 2, center[1] - 2),
-            (center[0] + 3, center[1] - 2),
-            (center[0] + 3, center[1] - 1),
-            (center[0] + 3, center[1] + 0),
-            (center[0] + 2, center[1] + 0),
-            (center[0] + 1, center[1] + 0),
-            (center[0] + 1, center[1] + 1),
-            (center[0] + 1, center[1] + 2),
-            (center[0] + 2, center[1] + 2),
-            (center[0] + 3, center[1] + 2)]
+        (x - 3, y - 2), (x - 3, y - 1), (x - 3, y), (x - 2, y),
+        (x - 1, y), (x - 1, y + 1), (x - 1, y + 2), (x + 1, y - 2),
+        (x + 2, y - 2), (x + 3, y - 2), (x + 3, y - 1), (x + 3, y),
+        (x + 2, y), (x + 1, y), (x + 1, y + 1), (x + 1, y + 2),
+        (x + 2, y + 2), (x + 3, y + 2)]
     return pattern_pos
