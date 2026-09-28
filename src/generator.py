@@ -1,4 +1,5 @@
 from .config import Config, load_config_model
+from .errors import InvalidConfigError
 
 
 class Cell:
@@ -49,6 +50,7 @@ class MazeGenerator:
     grid: list[list[Cell]]
     entry: Cell
     exit: Cell
+    has_pattern: bool = False
 
     def __init__(self) -> None:
         """
@@ -58,7 +60,19 @@ class MazeGenerator:
         """
         self.config = load_config_model()
         self.grid = generate_grid(self.config)
-        define_pattern(self.grid)
+        if self.config.width >= 8 and self.config.height >= 6:
+            self.has_pattern = True
+        if self.has_pattern:
+            pattern_pos = pattern_positions(calculate_center(self.grid))
+            define_pattern(self.grid)
+            msgs: list[str] = list()
+
+            if self.config.entry in pattern_pos:
+                msgs.append("ENTRY" + str(self.config.entry) + " cannot be part of the pattern")
+            if self.config.entry in pattern_pos:
+                msgs.append("EXIT" + str(self.config.exit) + " cannot be part of the pattern")
+            if len(msgs) > 0:
+                raise InvalidConfigError(msgs)
 
         entry_x, entry_y = self.config.entry
         exit_x, exit_y = self.config.exit

@@ -52,7 +52,7 @@ def generate_maze_ab(mazegen: MazeGenerator) -> None:
     current_cell = mazegen.entry
     visited_cells = 1
     total_cells = get_free_cells(mazegen)
-    seed = random.Random(123)
+    seed = random.Random(mazegen.config.seed)
     while visited_cells < total_cells:
         neighbors = get_neighbors(current_cell, mazegen.grid)
         next_cell, direction = seed.choice(neighbors)

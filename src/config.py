@@ -24,13 +24,13 @@ class Config(BaseModel):
 """
     width: int = Field(ge=0, le=35)
     height: int = Field(ge=0, le=20)
-    entry: tuple[Annotated[int, Field(ge=0, le=80)],
-                 Annotated[int, Field(ge=0, le=80)]]
-    exit: tuple[Annotated[int, Field(ge=0, le=80)],
-                Annotated[int, Field(ge=0, le=80)]]
-    output_file: str = Field(default="maze.txt", max_length=25)
+    entry: tuple[Annotated[int, Field(ge=0, le=35)],
+                 Annotated[int, Field(ge=0, le=20)]]
+    exit: tuple[Annotated[int, Field(ge=0, le=35)],
+                Annotated[int, Field(ge=0, le=20)]]
+    output_file: str = Field(default="output_maze.txt", max_length=25)
     perfect: bool = True
-    seed: float = Field(default=0.123, ge=0.0, le=1.0)
+    seed: int = Field(default=42, ge=0)
 
     @model_validator(mode='after')
     def config_validation_rules(self) -> "Config":
@@ -40,7 +40,7 @@ class Config(BaseModel):
         Check if the entry or the exit are in the border of the maze.
         """
         if (self.output_file == ""):
-            self.output_file = "maze.txt"
+            self.output_file = "output_maze.txt"
             print("Output file cannot be empty, using default 'maze.txt'.")
         if (self.entry[0] > self.width):
             raise ValueError("Entry out of bounds.")
