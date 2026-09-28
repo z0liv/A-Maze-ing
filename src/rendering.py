@@ -62,9 +62,9 @@ class View:
         size_line: int
     ) -> None:
         wall_size = self.wall_size
-        
+
         self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["background"])
+                        image_data, size_line, self.theme["background"])
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j,
                             image_data, size_line, self.theme["pattern"])

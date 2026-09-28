@@ -16,6 +16,7 @@ class DIRECTION(Enum):
     SOUTH = 4
     WEST = 8
 
+
 class COLOR(Enum):
 
     WHITE = (0xE7, 0xD9, 0xCD, 0xFF)

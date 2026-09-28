@@ -3,6 +3,7 @@ from src.errors import ParamsError, InvalidConfigError
 from src.algorithms import generate_maze_ab
 from src.rendering import View
 from src.enums import COLOR
+from src.export import export_maze
 
 
 def main() -> None:
@@ -30,6 +31,7 @@ def main() -> None:
                     wall_size,
                     mazegen.grid,
                     base_theme)
+        export_maze(mazegen)
         """ for row in mazegen.grid:
             print()
             for cell in row:

@@ -68,9 +68,11 @@ class MazeGenerator:
             msgs: list[str] = list()
 
             if self.config.entry in pattern_pos:
-                msgs.append("ENTRY" + str(self.config.entry) + " cannot be part of the pattern")
+                entry: str = "ENTRY" + str(self.config.entry)
+                msgs.append(entry + " cannot be part of the pattern")
             if self.config.entry in pattern_pos:
-                msgs.append("EXIT" + str(self.config.exit) + " cannot be part of the pattern")
+                exit: str = "EXIT" + str(self.config.exit)
+                msgs.append(exit + " cannot be part of the pattern")
             if len(msgs) > 0:
                 raise InvalidConfigError(msgs)
 
