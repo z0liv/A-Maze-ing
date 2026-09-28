@@ -2,6 +2,7 @@ from src.generator import MazeGenerator
 from src.errors import ParamsError, InvalidConfigError
 from src.algorithms import generate_maze_ab
 from src.rendering import View
+from src.enums import COLOR
 
 
 def main() -> None:
@@ -10,6 +11,14 @@ def main() -> None:
         vertical_margin: int = 350
         cell_size: int = 50
         wall_size: int = 2
+        base_theme: dict[str, COLOR] = {
+            "background": COLOR.DARK_BLUE,
+            "walls": COLOR.GREY,
+            "solution": COLOR.BLUE,
+            "entry": COLOR.MAGENTA,
+            "exit": COLOR.RED,
+            "pattern": COLOR.WHITE
+        }
 
         mazegen: MazeGenerator = MazeGenerator()
         generate_maze_ab(mazegen)
@@ -19,7 +28,8 @@ def main() -> None:
                     horizontal_margin,
                     vertical_margin,
                     wall_size,
-                    mazegen.grid)
+                    mazegen.grid,
+                    base_theme)
         """ for row in mazegen.grid:
             print()
             for cell in row:
