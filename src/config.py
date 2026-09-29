@@ -20,7 +20,7 @@ class Config(BaseModel):
             exit (tuple[int, int]): Coordinates of the exit point.
             output_file (str): Name of the output file for the generated maze.
             perfect (bool): Whether to generate a perfect or imperfect maze.
-            seed (float): Seed used to generate a specific maze.
+            seed (int): Seed used to generate a specific maze.
 """
     width: int = Field(ge=0, le=35)
     height: int = Field(ge=0, le=20)

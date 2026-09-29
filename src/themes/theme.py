@@ -1,5 +1,10 @@
 from ..enums import COLOR
 
+"""
+    Helper variable to store the fixed themes.
+"""
+
+
 THEMES: list[tuple[str, dict[str, COLOR]]] = [
     ("nostromo",  {
         "background": COLOR.NOS_BG,

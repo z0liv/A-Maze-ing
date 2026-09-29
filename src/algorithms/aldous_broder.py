@@ -34,6 +34,17 @@ def get_neighbors(
 
 
 def get_free_cells(mazegen: MazeGenerator) -> int:
+    """
+    Function that counts how many cells in the grid are not part of
+    the '42' pattern.
+
+    Parameters:
+        mazegen (MazeGenerator): MazeGenerator object that stores the
+        relevant information of the maze.
+    Returns:
+        An integer that represents the number of cells that are not part
+        of the '42' pattern.
+    """
     count: int = 0
     for row in mazegen.grid:
         for cell in row:
@@ -48,6 +59,8 @@ def generate_maze_ab(mazegen: MazeGenerator) -> list[list[Cell]]:
 
         Args:
             mazegen (MazeGenerator): The maze generator instance.
+        Returns:
+            A list of lists of cells that represents the grid.
     """
     current_cell = mazegen.entry
     visited_cells = 1

@@ -1,5 +1,6 @@
 """
-Expose the Config model and Maze generator as part of the package public API.
+Expose the Maze generator, CustomErrors,
+View class and the export_maze function.
 """
 from .generator import MazeGenerator, Cell
 from .errors import ParamsError, InvalidConfigError
