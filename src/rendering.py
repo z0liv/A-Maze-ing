@@ -105,6 +105,12 @@ class View:
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j,
                             image_data, size_line, self.theme["pattern"])
+        elif (cell.is_entry):
+            self.draw_pixel(row, cell, i, j,
+                            image_data, size_line, self.theme["entry"])
+        elif (cell.is_exit):
+            self.draw_pixel(row, cell, i, j,
+                            image_data, size_line, self.theme["exit"])
 
         # define maze borders
         top: bool = (self.grid.index(row) == 0 and i <= wall_size * 2)
@@ -125,22 +131,15 @@ class View:
                             self.theme["walls"])
 
         # if we are in a cell wall and the wall is placed, draw
-        # top wall
-        if (i < self.wall_size and (cell.walls >> 0) & 1):
+        if ((i < self.wall_size and (cell.walls >> 0) & 1)  # top wall
+                or (i >= self.cell_size - self.wall_size
+                    and (cell.walls >> 2) & 1)  # bottom wall
+                or (j < self.wall_size and (cell.walls >> 3) & 1)  # left wall
+                or (j >= self.cell_size - self.wall_size
+                    and (cell.walls >> 1) & 1)):  # right wall
             self.draw_pixel(row, cell, i, j,
                             image_data, size_line, self.theme["walls"])
-        # bottom wall
-        if (i >= self.cell_size - self.wall_size and (cell.walls >> 2) & 1):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["walls"])
-        # left wall
-        if (j < self.wall_size and (cell.walls >> 3) & 1):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["walls"])
-        # right wall
-        if (j >= self.cell_size - self.wall_size and (cell.walls >> 1) & 1):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["walls"])
+
         # restart wall size if altered
         if (self.wall_size != wall_size):
             self.wall_size //= 2
@@ -256,7 +255,7 @@ class View:
                                ptr[1],
                                int(self.h_margin / 2),
                                self.window_height - (self.cell_size * i),
-                               0xFFFFFFFF,
+                               0xFFFFFFFF,  # ARGB
                                opt)
             i -= 1
 

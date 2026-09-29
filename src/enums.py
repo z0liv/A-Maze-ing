@@ -17,7 +17,7 @@ class DIRECTION(Enum):
     WEST = 8
 
 
-class COLOR(Enum):
+class COLOR(Enum):  # BGRA
 
     WHITE = (0xE7, 0xD9, 0xCD, 0xFF)
     BLACK = (0x00, 0x00, 0x00, 0xFF)
