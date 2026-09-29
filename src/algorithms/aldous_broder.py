@@ -42,7 +42,7 @@ def get_free_cells(mazegen: MazeGenerator) -> int:
     return count
 
 
-def generate_maze_ab(mazegen: MazeGenerator) -> None:
+def generate_maze_ab(mazegen: MazeGenerator) -> list[list[Cell]]:
     """
         Generate the maze using the Aldous-Broder algorithm.
 
@@ -52,17 +52,20 @@ def generate_maze_ab(mazegen: MazeGenerator) -> None:
     current_cell = mazegen.entry
     visited_cells = 1
     total_cells = get_free_cells(mazegen)
-    seed = random.Random(mazegen.config.seed)
+    if (mazegen.config.seed and mazegen.use_seed):
+        rnd = random.Random(mazegen.config.seed)
+    else:
+        rnd = random.Random()
     while visited_cells < total_cells:
         neighbors = get_neighbors(current_cell, mazegen.grid)
-        next_cell, direction = seed.choice(neighbors)
+        next_cell, direction = rnd.choice(neighbors)
         if not next_cell.visited:
             current_cell.walls &= ~direction.value
             next_cell.walls &= ~opposite(direction).value
             next_cell.visited = True
             visited_cells += 1
-
         current_cell = next_cell
+    return mazegen.grid
 
 
 def opposite(direction: DIRECTION) -> DIRECTION:
