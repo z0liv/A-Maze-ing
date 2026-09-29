@@ -28,6 +28,12 @@ class View:
         theme: A dictionary that stores the colors to apply to each part of the
                maze.
     """
+
+    image_data: Any
+    size_line: int
+    ptr: tuple[int | None, ...]
+    mlx: Mlx
+
     def __init__(
             self,
             window_width: int,
@@ -37,7 +43,7 @@ class View:
             v_margin: int,
             wall_size: int,
             grid: list[list[Cell]],
-            theme: dict[str, COLOR]
+            theme: dict[str, COLOR],
     ) -> None:
         """
         Initialize the view with the attributes defined previously.
@@ -60,7 +66,7 @@ class View:
             mazegen.use_seed = False
             self.grid = generate_maze_ab(mazegen)
             export_maze(mazegen)
-            self.generate_view()
+            self.draw_and_show(self.image_data, self.size_line, self.mlx, self.ptr)
         elif keycode == 50:
             print("Option 2 selected\nShow / Hide the shortest path")
         elif keycode == 51:
@@ -76,6 +82,9 @@ class View:
         and draws the maze along with the user interaction options.
         """
         image_data, size_line, mlx, ptr = self.initialize_image()
+        self.draw_and_show(image_data, size_line, mlx, ptr)
+
+    def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx, ptr: tuple[int | None, ...]):
         self.draw_complete_grid(image_data, size_line)
         self.write_options(mlx, ptr)
         self.show_image(mlx, ptr)
@@ -232,18 +241,18 @@ class View:
         """
         Initializes the graphics, the window and the image with its data.
         """
-        mlx = Mlx()
-        mlx_ptr = mlx.mlx_init()
-        win_ptr = mlx.mlx_new_window(
+        self.mlx = Mlx()
+        mlx_ptr = self.mlx.mlx_init()
+        win_ptr = self.mlx.mlx_new_window(
             mlx_ptr,
             self.window_width,
             self.window_height,
             "A-Maze-ing")
-        mlx.mlx_clear_window(mlx_ptr, win_ptr)
-        img_ptr = mlx.mlx_new_image(mlx_ptr, 2000, 2000)
-        data, _, size_line, _ = mlx.mlx_get_data_addr(img_ptr)
-        ptr = (mlx_ptr, win_ptr, img_ptr)
-        return data, size_line, mlx, ptr
+        self.mlx.mlx_clear_window(mlx_ptr, win_ptr)
+        img_ptr = self.mlx.mlx_new_image(mlx_ptr, 2000, 2000)
+        self.image_data, _, self.size_line, _ = self.mlx.mlx_get_data_addr(img_ptr)
+        self.ptr = (mlx_ptr, win_ptr, img_ptr)
+        return self.image_data, self.size_line, self.mlx, self.ptr
 
     def write_options(self, mlx: Mlx, ptr: tuple[int | None, ...]) -> None:
         """
