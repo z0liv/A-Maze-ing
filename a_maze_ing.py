@@ -4,6 +4,7 @@ from src.algorithms import generate_maze_ab
 from src.rendering import View
 from src.enums import COLOR
 from src.export import export_maze
+from src.themes import THEMES
 
 
 def main() -> None:
@@ -12,14 +13,7 @@ def main() -> None:
         vertical_margin: int = 350
         cell_size: int = 50
         wall_size: int = 2
-        base_theme: dict[str, COLOR] = {
-            "background": COLOR.DARK_BLUE,
-            "walls": COLOR.GREY,
-            "solution": COLOR.BLUE,
-            "entry": COLOR.MAGENTA,
-            "exit": COLOR.RED,
-            "pattern": COLOR.WHITE
-        }
+        base_theme: dict[str, COLOR] = THEMES[0][1]
 
         mazegen: MazeGenerator = MazeGenerator()
         generate_maze_ab(mazegen)
