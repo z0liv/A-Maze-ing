@@ -61,20 +61,19 @@ class View:
         """
         Handles the user interactions through specific keys
         """
-        if keycode == 49:
+        if keycode == 49 or keycode == 65436:
             mazegen: MazeGenerator = MazeGenerator()
             mazegen.use_seed = False
             self.grid = generate_maze_ab(mazegen)
             export_maze(mazegen)
             self.draw_and_show(
                 self.image_data, self.size_line, self.mlx, self.ptr)
-        elif keycode == 50:
+        elif keycode == 50 or keycode == 65433:
             print("Option 2 selected\nShow / Hide the shortest path")
-        elif keycode == 51:
+        elif keycode == 51 or keycode == 65435:
             print("Option 3 selected\nRotate the wall colours")
-        elif keycode == 52:
+        elif keycode == 52 or keycode == 65430:
             print("Option 4 selected\nExit")
-            mlx.mlx_mouse_hook(win_ptr, None, None)
             os._exit(0)
 
     def generate_view(self) -> None:
@@ -288,6 +287,11 @@ class View:
 
         def on_key(keynum: int, _: Any) -> None:
             self.key_handler(keynum, mlx, ptr[1])
+
+        def on_destroy(_: Any) -> None:
+            mlx.mlx_loop_exit(ptr[0])
         stuff = [1, 2]
         mlx.mlx_key_hook(ptr[1], on_key, stuff)
+        mlx.mlx_hook(ptr[1], 33, 0, on_destroy, None)
         mlx.mlx_loop(ptr[0])
+        os._exit(0)
