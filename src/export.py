@@ -19,9 +19,9 @@ def list_content(mazegen: MazeGenerator) -> list[str]:
     """
     Format the maze information into the correct output format
     given by the subject.
-    
+
     Transform each cell into hexadecimal removing the prefix.
-    Looping the grid row by row adding cell by cell in the 
+    Looping the grid row by row adding cell by cell in the
     list to return as a string.
 
     Parameters:

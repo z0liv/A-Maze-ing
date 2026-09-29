@@ -88,14 +88,14 @@ class MazeGenerator:
 
 def generate_grid(config: Config) -> list[list[Cell]]:
     """
-        Generate the grid of cells that will be used to create the maze.
+    Generate the grid of cells that will be used to create the maze.
 
-        Args:
-            config (Config): The configuration model that contains the
-                information about the maze.
+    Args:
+        config (Config): The configuration model that contains the
+            information about the maze.
 
-        Returns:
-            A 2D list of Cell objects that represents the grid of cells.
+    Returns:
+        A 2D list of Cell objects that represents the grid of cells.
     """
     grid: list[list[Cell]] = []
     for y in range(config.height):
@@ -113,6 +113,13 @@ def generate_grid(config: Config) -> list[list[Cell]]:
 
 
 def define_pattern(grid: list[list[Cell]]) -> None:
+    """
+    Calls a function that calculates the grid's center and checks every cell to
+    alter some of it' values.
+
+    Args:
+        grid: The data structure that stores all the cells.
+    """
     center: tuple[int, int] = calculate_center(grid)
     for row in grid:
         for cell in row:
@@ -122,6 +129,16 @@ def define_pattern(grid: list[list[Cell]]) -> None:
 
 
 def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
+    """
+    Calculates the center of the grid depending on the parity of the number of
+    cells per row and column.
+
+    Args:
+        grid: The data structure that stores all the cells.
+
+    Returns:
+        A pair of x,y values that represent the chosen center cell of the grid.
+    """
     center: tuple[int, int]
     width: int = len(grid[0])
     height: int = len(grid)
@@ -137,6 +154,13 @@ def calculate_center(grid: list[list[Cell]]) -> tuple[int, int]:
 
 
 def pattern_positions(center: tuple[int, int]) -> list[tuple[int, int]]:
+    """
+    Calculates and stores all the cells that belong to the pattern
+    Args:
+        center: A pair of x, y values that represent the center.
+    Returns:
+        A list of the selected cells
+    """
     x, y = center
     pattern_pos: list[tuple[int, int]] = [
         (x - 3, y - 2), (x - 3, y - 1), (x - 3, y), (x - 2, y),

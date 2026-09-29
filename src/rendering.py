@@ -66,7 +66,8 @@ class View:
             mazegen.use_seed = False
             self.grid = generate_maze_ab(mazegen)
             export_maze(mazegen)
-            self.draw_and_show(self.image_data, self.size_line, self.mlx, self.ptr)
+            self.draw_and_show(
+                self.image_data, self.size_line, self.mlx, self.ptr)
         elif keycode == 50:
             print("Option 2 selected\nShow / Hide the shortest path")
         elif keycode == 51:
@@ -84,7 +85,8 @@ class View:
         image_data, size_line, mlx, ptr = self.initialize_image()
         self.draw_and_show(image_data, size_line, mlx, ptr)
 
-    def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx, ptr: tuple[int | None, ...]):
+    def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
+                      ptr: tuple[int | None, ...]) -> None:
         self.draw_complete_grid(image_data, size_line)
         self.write_options(mlx, ptr)
         self.show_image(mlx, ptr)
@@ -250,7 +252,8 @@ class View:
             "A-Maze-ing")
         self.mlx.mlx_clear_window(mlx_ptr, win_ptr)
         img_ptr = self.mlx.mlx_new_image(mlx_ptr, 2000, 2000)
-        self.image_data, _, self.size_line, _ = self.mlx.mlx_get_data_addr(img_ptr)
+        self.image_data, _, self.size_line, _ = self.mlx.mlx_get_data_addr(
+            img_ptr)
         self.ptr = (mlx_ptr, win_ptr, img_ptr)
         return self.image_data, self.size_line, self.mlx, self.ptr
 
