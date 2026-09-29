@@ -1,5 +1,8 @@
 from .generator import Cell
 from .enums import COLOR
+from .generator import MazeGenerator
+from .algorithms import generate_maze_ab
+from .export import export_maze
 from mlx import Mlx
 from typing import Any
 import os
@@ -53,7 +56,11 @@ class View:
         Handles the user interactions through specific keys
         """
         if keycode == 49:
-            print("Option 1 selected\nRe-generated a new maze")
+            mazegen: MazeGenerator = MazeGenerator()
+            mazegen.use_seed = False
+            self.grid = generate_maze_ab(mazegen)
+            export_maze(mazegen)
+            self.generate_view()
         elif keycode == 50:
             print("Option 2 selected\nShow / Hide the shortest path")
         elif keycode == 51:

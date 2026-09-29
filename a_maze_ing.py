@@ -16,7 +16,8 @@ def main() -> None:
         base_theme: dict[str, COLOR] = THEMES[0][1]
 
         mazegen: MazeGenerator = MazeGenerator()
-        generate_maze_ab(mazegen)
+        mazegen.use_seed = True
+        mazegen.grid = generate_maze_ab(mazegen)
         view = View(mazegen.config.width * cell_size + horizontal_margin,
                     mazegen.config.height * cell_size + vertical_margin,
                     cell_size,
@@ -26,15 +27,6 @@ def main() -> None:
                     mazegen.grid,
                     base_theme)
         export_maze(mazegen)
-        """ for row in mazegen.grid:
-            print()
-            for cell in row:
-                print("pos", cell.position, "\n",
-                      "walls", cell.walls, "\n",
-                      "pattern", cell.is_pattern, "\n",
-                      "entry", cell.is_entry, "\n",
-                      "exit", cell.is_exit, "\n")
-                print(hex(cell.walls).removeprefix("0x"), end="") """
         view.generate_view()
     except Exception as error:
         if isinstance(error, ParamsError):
