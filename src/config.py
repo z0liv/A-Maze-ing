@@ -30,7 +30,7 @@ class Config(BaseModel):
                 Annotated[int, Field(ge=0, le=20)]]
     output_file: str = Field(default="output_maze.txt", max_length=25)
     perfect: bool = True
-    seed: int = Field(ge=0)
+    seed: int = Field(default=42, ge=0)
 
     @model_validator(mode='after')
     def config_validation_rules(self) -> "Config":

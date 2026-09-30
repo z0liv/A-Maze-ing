@@ -13,7 +13,7 @@ def main() -> None:
         vertical_margin: int = 350
         cell_size: int = 50
         wall_size: int = 2
-        base_theme: dict[str, COLOR] = THEMES[0][1]
+        base_theme: tuple[str, dict[str, COLOR]] = THEMES[0]
 
         mazegen: MazeGenerator = MazeGenerator()
         mazegen.use_seed = True
