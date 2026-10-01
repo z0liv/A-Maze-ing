@@ -15,9 +15,7 @@ def main() -> None:
         cell_size: int = 50
         wall_size: int = 2
         base_theme: tuple[str, dict[str, COLOR]] = THEMES[0]
-
         mazegen: MazeGenerator = MazeGenerator()
-        mazegen.use_seed = True
         rnd = random.Random()
         mazegen.grid = generate_maze_ab(mazegen, rnd)
         view = View(mazegen.config.width * cell_size + horizontal_margin,
@@ -26,8 +24,8 @@ def main() -> None:
                     horizontal_margin,
                     vertical_margin,
                     wall_size,
-                    mazegen.grid,
-                    base_theme)
+                    base_theme,
+                    mazegen)
         export_maze(mazegen)
         view.generate_view()
     except Exception as error:

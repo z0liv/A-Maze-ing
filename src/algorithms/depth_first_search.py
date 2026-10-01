@@ -26,6 +26,3 @@ def generate_maze_dfs(mazegen: MazeGenerator, rnd: Random) -> list[list[Cell]]:
 
     recursive_dfs(mazegen.entry)
     return mazegen.grid
-
-
-

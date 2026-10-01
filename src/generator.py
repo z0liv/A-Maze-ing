@@ -51,7 +51,7 @@ class MazeGenerator:
     entry: Cell
     exit: Cell
     has_pattern: bool = False
-    use_seed: bool
+    seed: int
 
     def __init__(self) -> None:
         """

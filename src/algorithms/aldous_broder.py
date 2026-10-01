@@ -16,10 +16,6 @@ def generate_maze_ab(mazegen: MazeGenerator,
     current_cell = mazegen.entry
     visited_cells = 1
     total_cells = get_free_cells(mazegen)
-    if mazegen.use_seed:
-        rnd = random.Random(mazegen.config.seed)
-    else:
-        rnd = random.Random()
     while visited_cells < total_cells:
         neighbors = get_neighbors(current_cell, mazegen.grid)
         next_cell, direction = rnd.choice(neighbors)

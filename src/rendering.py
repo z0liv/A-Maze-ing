@@ -1,6 +1,5 @@
 from .generator import Cell, MazeGenerator
 from .enums import COLOR
-from .generator import MazeGenerator
 from .algorithms import generate_maze_dfs
 from .export import export_maze
 from .themes import THEMES
@@ -33,7 +32,7 @@ class View:
 
     image_data: Any
     size_line: int
-    ptr: tuple[int | None, ...] # [mlx, win, image]
+    ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
 
     def __init__(
@@ -44,8 +43,8 @@ class View:
             h_margin: int,
             v_margin: int,
             wall_size: int,
-            grid: list[list[Cell]],
             theme: tuple[str, dict[str, COLOR]],
+            mazegen: MazeGenerator
     ) -> None:
         """
         Initialize the view with the attributes defined previously.
@@ -56,21 +55,15 @@ class View:
         self.h_margin = h_margin
         self.v_margin = v_margin
         self.wall_size = wall_size
-        self.grid = grid
         self.theme = theme
+        self.mazegen = mazegen
 
     def key_handler(self, keycode: int, ptr: tuple[int | None, ...]) -> None:
         """
         Handles the user interactions through specific keys
         """
         if keycode == 49 or keycode == 65436:
-            mazegen: MazeGenerator = MazeGenerator()
-            rnd = random.Random()
-            self.grid = generate_maze_dfs(mazegen, rnd)
-            export_maze(mazegen)
-            self.draw_and_show(
-                self.image_data, self.size_line, self.mlx, self.ptr)
-            self.redraw_maze(False)
+            self.redo_maze()
         elif keycode == 50 or keycode == 65433:
             print("Option 2 selected\nShow / Hide the shortest path")
         elif keycode == 51 or keycode == 65435:
@@ -78,7 +71,8 @@ class View:
             primary = self.theme[1]["walls"]
             self.theme[1]['background'] = primary
             self.theme[1]['walls'] = bg
-            self.redraw_maze(True)
+            self.draw_and_show(
+                self.image_data, self.size_line, self.mlx, self.ptr)
         elif keycode == 52 or keycode == 65430:
             if self.theme[0] == 'nostromo':
                 self.theme = THEMES[1]
@@ -86,18 +80,17 @@ class View:
                 self.theme = THEMES[2]
             else:
                 self.theme = THEMES[0]
-            self.redraw_maze(True)
+            self.draw_and_show(
+                self.image_data, self.size_line, self.mlx, self.ptr)
         elif keycode == 53 or keycode == 65437:
             print("Exit")
             self.mlx.mlx_loop_exit(ptr[0])
 
-
-    def redraw_maze(self, seed: bool) -> None:
-        mazegen: MazeGenerator = MazeGenerator()
-        rnd = random.Random(seed)
-        mazegen.use_seed = seed
-        self.grid = generate_maze_dfs(mazegen, rnd)
-        export_maze(mazegen)
+    def redo_maze(self) -> None:
+        self.mazegen = MazeGenerator()
+        rnd = random.Random()
+        self.mazegen.grid = generate_maze_dfs(self.mazegen, rnd)
+        export_maze(self.mazegen)
         self.draw_and_show(
             self.image_data, self.size_line, self.mlx, self.ptr)
 
@@ -107,7 +100,7 @@ class View:
         and draws the maze along with the user interaction options.
         """
         image_data, size_line, mlx, ptr = self.initialize_image()
-        self.draw_and_show(image_data, size_line, mlx, ptr  )
+        self.draw_and_show(image_data, size_line, mlx, ptr)
 
     def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
                       ptr: tuple[int | None, ...]) -> None:
@@ -120,7 +113,7 @@ class View:
         For each pixel in each cell, calls a function that decides if the pixel
         needs to be drawn
         """
-        for row in self.grid:
+        for row in self.mazegen.grid:
             for cell in row:
                 for i in range(self.cell_size):
                     for j in range(self.cell_size):
@@ -155,9 +148,11 @@ class View:
                             image_data, size_line, self.theme[1]["exit"])
 
         # define maze borders
-        top: bool = (self.grid.index(row) == 0 and i <= wall_size * 2)
-        bottom: bool = (self.grid.index(row) == len(self.grid) - 1
-                        and i >= self.cell_size - wall_size * 2)
+        top: bool = (self.mazegen.grid.index(row) == 0 and i <= wall_size * 2)
+        bottom: bool = (
+            self.mazegen.grid.index(row) == len(self.mazegen.grid) - 1
+            and i >= self.cell_size - wall_size * 2
+        )
         left: bool = (row.index(cell) == 0 and j <= wall_size * 2)
         right: bool = (row.index(cell) == len(row) - 1
                        and j >= self.cell_size - wall_size * 2)
@@ -208,7 +203,7 @@ class View:
         belong to that position with a specified color.
         """
         px = row.index(cell) * self.cell_size + j
-        py = self.grid.index(row) * self.cell_size + i
+        py = self.mazegen.grid.index(row) * self.cell_size + i
         start = self.offset(px, py, size_line)
         image_data[start:start + 4] = bytes(color.value)
 
@@ -226,38 +221,40 @@ class View:
         start: int = self.wall_size
         end: int = self.cell_size - start
         if (i < start and j < start):
-            if (self.grid.index(row) > 0 and row.index(cell) > 0):
-                left_top_cell: Cell = self.grid[
-                    self.grid.index(row) - 1][row.index(cell) - 1]
+            if (self.mazegen.grid.index(row) > 0 and row.index(cell) > 0):
+                left_top_cell: Cell = self.mazegen.grid[
+                    self.mazegen.grid.index(row) - 1][row.index(cell) - 1]
                 if ((cell.walls >> 0) & 1 or (cell.walls >> 3) & 1
                         or (left_top_cell.walls >> 1) & 1
                         or (left_top_cell.walls >> 2) & 1):
                     return True
         elif (j >= end and i < start):
-            if (self.grid.index(row) > 0 and row.index(cell) < len(row) - 1):
-                right_top_cell: Cell = self.grid[
-                    self.grid.index(row) - 1][row.index(cell) + 1]
+            if (self.mazegen.grid.index(row) > 0
+                    and row.index(cell) < len(row) - 1):
+                right_top_cell: Cell = self.mazegen.grid[
+                    self.mazegen.grid.index(row) - 1][row.index(cell) + 1]
                 if ((cell.walls >> 0) & 1 or (cell.walls >> 1) & 1
                         or (right_top_cell.walls >> 2) & 1
                         or (right_top_cell.walls >> 3) & 1):
                     return True
         elif (j < start and i >= end):
             if (row.index(cell) > 0
-                    and self.grid.index(row) < len(self.grid) - 1):
-                left_bottom_cell: Cell = self.grid[
-                    self.grid.index(row) + 1][row.index(cell) - 1]
+                and self.mazegen.grid.index(row) < len(
+                    self.mazegen.grid) - 1):
+                left_bottom_cell: Cell = self.mazegen.grid[
+                    self.mazegen.grid.index(row) + 1][row.index(cell) - 1]
                 if ((cell.walls >> 2) & 1 or (cell.walls >> 3) & 1
                         or (left_bottom_cell.walls >> 0) & 1
                         or (left_bottom_cell.walls >> 1) & 1):
                     return True
         elif (i >= end and j >= end):
-            if (self.grid.index(row) < len(self.grid) - 1
+            if (self.mazegen.grid.index(row) < len(self.mazegen.grid) - 1
                     and row.index(cell) < len(row) - 1):
-                rigth_bottom_cell: Cell = self.grid[
-                    self.grid.index(row) + 1][row.index(cell) + 1]
+                right_bottom_cell: Cell = self.mazegen.grid[
+                    self.mazegen.grid.index(row) + 1][row.index(cell) + 1]
                 if ((cell.walls >> 2) & 1 or (cell.walls >> 1) & 1
-                        or (rigth_bottom_cell.walls >> 0) & 1
-                        or (rigth_bottom_cell.walls >> 3) & 1):
+                        or (right_bottom_cell.walls >> 0) & 1
+                        or (right_bottom_cell.walls >> 3) & 1):
                     return True
         return False
 
