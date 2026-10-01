@@ -5,6 +5,7 @@ from src.rendering import View
 from src.enums import COLOR
 from src.export import export_maze
 from src.themes import THEMES
+import random
 
 
 def main() -> None:
@@ -17,7 +18,8 @@ def main() -> None:
 
         mazegen: MazeGenerator = MazeGenerator()
         mazegen.use_seed = True
-        mazegen.grid = generate_maze_ab(mazegen)
+        rnd = random.Random()
+        mazegen.grid = generate_maze_ab(mazegen, rnd)
         view = View(mazegen.config.width * cell_size + horizontal_margin,
                     mazegen.config.height * cell_size + vertical_margin,
                     cell_size,

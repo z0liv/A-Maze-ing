@@ -1,10 +1,11 @@
 from .generator import Cell
 from .enums import COLOR
 from .generator import MazeGenerator
-from .algorithms import generate_maze_ab
+from .algorithms import generate_maze_dfs
 from .export import export_maze
 from mlx import Mlx
 from typing import Any
+import random
 import os
 
 
@@ -63,8 +64,8 @@ class View:
         """
         if keycode == 49 or keycode == 65436:
             mazegen: MazeGenerator = MazeGenerator()
-            mazegen.use_seed = False
-            self.grid = generate_maze_ab(mazegen)
+            rnd = random.Random()
+            self.grid = generate_maze_dfs(mazegen, rnd)
             export_maze(mazegen)
             self.draw_and_show(
                 self.image_data, self.size_line, self.mlx, self.ptr)
