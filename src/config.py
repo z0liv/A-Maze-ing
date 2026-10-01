@@ -31,6 +31,7 @@ class Config(BaseModel):
     output_file: str = Field(default="output_maze.txt", max_length=25)
     perfect: bool = False
     seed: int = Field(default=42, ge=0)
+    algorithm: str = Field(default="ab", max_length=10)
 
     @model_validator(mode='after')
     def config_validation_rules(self) -> "Config":
@@ -42,6 +43,11 @@ class Config(BaseModel):
         if (self.output_file == ""):
             self.output_file = "output_maze.txt"
             print("Output file cannot be empty, using default 'maze.txt'.")
+        if (self.algorithm != "ab" or self.algorithm != "dfs"):
+            self.algorithm = "ab"
+            print("There are only 2 available algos",
+                  "ab and dfs",
+                  ", using default 'maze.txt'.")
         if (self.entry[0] >= self.width or self.entry[0] < 0):
             raise ValueError("Entry out of bounds.")
         if (self.entry[1] >= self.height or self.entry[1] < 0):

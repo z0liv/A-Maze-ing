@@ -18,7 +18,7 @@ run: create-venv install
 debug:
 	$(DEBUG) $(MAIN) $(CONFIG)
 
-install: requirements.txt
+install: create-venv requirements.txt
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install mlx-2.4-py3-none-any.whl
 

@@ -17,7 +17,10 @@ def main() -> None:
 
         mazegen: MazeGenerator = MazeGenerator()
         mazegen.use_seed = True
-        mazegen.grid = generate_maze_ab(mazegen)
+        if mazegen.config.algorithm == "ab":
+            mazegen.grid = generate_maze_ab(mazegen)
+        else:
+            mazegen.grid = (mazegen)
         view = View(mazegen.config.width * cell_size + horizontal_margin,
                     mazegen.config.height * cell_size + vertical_margin,
                     cell_size,
