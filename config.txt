@@ -4,3 +4,5 @@ ENTRY=0,0
 PERFECT=False
 EXIT=11,11
 OUTPUT_FILE=maze.txt
+# available maze generating algorithms (Aldous broder, Deep first search): ab, dfs
+ALGORITHM=ab

@@ -1,6 +1,6 @@
 from src.generator import MazeGenerator
 from src.errors import ParamsError, InvalidConfigError
-from src.algorithms import generate_maze_ab
+from src.algorithms import generate_maze_ab, generate_maze_dfs
 from src.rendering import View
 from src.enums import COLOR
 from src.export import export_maze
@@ -17,7 +17,10 @@ def main() -> None:
         base_theme: tuple[str, dict[str, COLOR]] = THEMES[0]
         mazegen: MazeGenerator = MazeGenerator()
         rnd = random.Random()
-        mazegen.grid = generate_maze_ab(mazegen, rnd)
+        if mazegen.config.algorithm == "ab":
+            mazegen.grid = generate_maze_ab(mazegen, rnd)
+        else:
+            mazegen.grid = generate_maze_dfs(mazegen, rnd)
         view = View(mazegen.config.width * cell_size + horizontal_margin,
                     mazegen.config.height * cell_size + vertical_margin,
                     cell_size,

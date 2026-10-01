@@ -1,4 +1,5 @@
-.venv
-.mypy_cache
-
-*.pyc
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/

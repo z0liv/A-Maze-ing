@@ -1,6 +1,6 @@
 from .generator import Cell, MazeGenerator
 from .enums import COLOR
-from .algorithms import generate_maze_dfs
+from .algorithms import generate_maze_ab, generate_maze_dfs
 from .export import export_maze
 from .themes import THEMES
 from mlx import Mlx
@@ -89,7 +89,10 @@ class View:
     def redo_maze(self) -> None:
         self.mazegen = MazeGenerator()
         rnd = random.Random()
-        self.mazegen.grid = generate_maze_dfs(self.mazegen, rnd)
+        if self.mazegen.config.algorithm == "ab":
+            self.grid = generate_maze_ab(self.mazegen, rnd)
+        else:
+            self.grid = generate_maze_dfs(self.mazegen, rnd)
         export_maze(self.mazegen)
         self.draw_and_show(
             self.image_data, self.size_line, self.mlx, self.ptr)
@@ -102,8 +105,10 @@ class View:
         image_data, size_line, mlx, ptr = self.initialize_image()
         self.draw_and_show(image_data, size_line, mlx, ptr)
 
-    def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
-                      ptr: tuple[int | None, ...]) -> None:
+    def draw_and_show(
+        self, image_data: Any, size_line: int, mlx: Mlx,
+        ptr: tuple[int | None, ...]
+    ) -> None:
         self.write_options(mlx, ptr)
         self.draw_complete_grid(image_data, size_line)
         self.show_image(mlx, ptr)
