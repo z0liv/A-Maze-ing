@@ -1,10 +1,11 @@
 from .generator import Cell, MazeGenerator
 from .enums import COLOR
-from .algorithms import generate_maze_ab
+from .algorithms import generate_maze_ab, generate_maze_dfs
 from .export import export_maze
 from .themes import THEMES
 from mlx import Mlx
 from typing import Any
+import random
 import os
 
 
@@ -31,7 +32,7 @@ class View:
 
     image_data: Any
     size_line: int
-    ptr: tuple[int | None, ...] # [mlx, win, image]
+    ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
 
     def __init__(
@@ -62,6 +63,16 @@ class View:
         Handles the user interactions through specific keys
         """
         if keycode == 49 or keycode == 65436:
+            mazegen: MazeGenerator = MazeGenerator()
+            mazegen.use_seed = False
+            rnd = random.Random()
+            if mazegen.config.algorithm == "ab":
+                self.grid = generate_maze_ab(mazegen, rnd)
+            else:
+                self.grid = generate_maze_dfs(mazegen, rnd)
+            export_maze(mazegen)
+            self.draw_and_show(
+                self.image_data, self.size_line, self.mlx, self.ptr)
             self.redraw_maze(False)
         elif keycode == 50 or keycode == 65433:
             print("Option 2 selected\nShow / Hide the shortest path")
@@ -83,11 +94,14 @@ class View:
             print("Exit")
             self.mlx.mlx_loop_exit(ptr[0])
 
-
     def redraw_maze(self, seed: bool) -> None:
         mazegen: MazeGenerator = MazeGenerator()
+        rnd = random.Random(seed)
         mazegen.use_seed = seed
-        self.grid = generate_maze_ab(mazegen)
+        if mazegen.config.algorithm == "ab":
+            self.grid = generate_maze_ab(mazegen, rnd)
+        else:
+            self.grid = generate_maze_dfs(mazegen, rnd)
         export_maze(mazegen)
         self.draw_and_show(
             self.image_data, self.size_line, self.mlx, self.ptr)
@@ -98,10 +112,12 @@ class View:
         and draws the maze along with the user interaction options.
         """
         image_data, size_line, mlx, ptr = self.initialize_image()
-        self.draw_and_show(image_data, size_line, mlx, ptr  )
+        self.draw_and_show(image_data, size_line, mlx, ptr)
 
-    def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
-                      ptr: tuple[int | None, ...]) -> None:
+    def draw_and_show(
+        self, image_data: Any, size_line: int, mlx: Mlx,
+        ptr: tuple[int | None, ...]
+    ) -> None:
         self.write_options(mlx, ptr)
         self.draw_complete_grid(image_data, size_line)
         self.show_image(mlx, ptr)

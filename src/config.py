@@ -43,7 +43,7 @@ class Config(BaseModel):
         if (self.output_file == ""):
             self.output_file = "output_maze.txt"
             print("Output file cannot be empty, using default 'maze.txt'.")
-        if (self.algorithm != "ab" or self.algorithm != "dfs"):
+        if (self.algorithm != "ab" and self.algorithm != "dfs"):
             self.algorithm = "ab"
             print("There are only 2 available algos",
                   "ab and dfs",
