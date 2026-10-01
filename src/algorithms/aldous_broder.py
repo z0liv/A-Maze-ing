@@ -65,7 +65,7 @@ def generate_maze_ab(mazegen: MazeGenerator) -> list[list[Cell]]:
     current_cell = mazegen.entry
     visited_cells = 1
     total_cells = get_free_cells(mazegen)
-    if (mazegen.config.seed and mazegen.use_seed):
+    if mazegen.use_seed:
         rnd = random.Random(mazegen.config.seed)
     else:
         rnd = random.Random()

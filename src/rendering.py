@@ -31,7 +31,7 @@ class View:
 
     image_data: Any
     size_line: int
-    ptr: tuple[int | None, ...]
+    ptr: tuple[int | None, ...] # [mlx, win, image]
     mlx: Mlx
 
     def __init__(
@@ -57,7 +57,7 @@ class View:
         self.grid = grid
         self.theme = theme
 
-    def key_handler(self, keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
+    def key_handler(self, keycode: int, ptr: tuple[int | None, ...]) -> None:
         """
         Handles the user interactions through specific keys
         """
@@ -79,9 +79,10 @@ class View:
             else:
                 self.theme = THEMES[0]
             self.redraw_maze(True)
-        elif keycode == 53 or keycode == 65433:
-            print("Option 5 selected\nExit")
-            os._exit(0)
+        elif keycode == 53 or keycode == 65437:
+            print("Exit")
+            self.mlx.mlx_loop_exit(ptr[0])
+
 
     def redraw_maze(self, seed: bool) -> None:
         mazegen: MazeGenerator = MazeGenerator()
@@ -97,12 +98,12 @@ class View:
         and draws the maze along with the user interaction options.
         """
         image_data, size_line, mlx, ptr = self.initialize_image()
-        self.draw_and_show(image_data, size_line, mlx, ptr)
+        self.draw_and_show(image_data, size_line, mlx, ptr  )
 
     def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
                       ptr: tuple[int | None, ...]) -> None:
-        self.draw_complete_grid(image_data, size_line)
         self.write_options(mlx, ptr)
+        self.draw_complete_grid(image_data, size_line)
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
@@ -280,7 +281,7 @@ class View:
             "2. Show / Hide the shortest path",
             "3. Rotate the wall colours",
             "4. Switch theme",
-            "5. Quit",
+            "5. Exit",
         ]
         i = 5
         for opt in options:
@@ -301,7 +302,7 @@ class View:
                                     int(self.h_margin / 2))
 
         def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum, mlx, ptr[1])
+            self.key_handler(keynum, ptr)
 
         def on_destroy(_: Any) -> None:
             mlx.mlx_loop_exit(ptr[0])

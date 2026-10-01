@@ -10,7 +10,7 @@ from src.themes import THEMES
 def main() -> None:
     try:
         horizontal_margin: int = 100
-        vertical_margin: int = 350
+        vertical_margin: int = 380
         cell_size: int = 50
         wall_size: int = 2
         base_theme: tuple[str, dict[str, COLOR]] = THEMES[0]
