@@ -22,15 +22,15 @@ class Config(BaseModel):
             perfect (bool): Whether to generate a perfect or imperfect maze.
             seed (int): Seed used to generate a specific maze.
 """
-    width: int = Field(ge=0, le=35)
-    height: int = Field(ge=0, le=20)
+    width: int = Field(gt=0, le=35)
+    height: int = Field(gt=0, le=20)
     entry: tuple[Annotated[int, Field(ge=0, le=35)],
                  Annotated[int, Field(ge=0, le=20)]]
     exit: tuple[Annotated[int, Field(ge=0, le=35)],
                 Annotated[int, Field(ge=0, le=20)]]
     output_file: str = Field(default="output_maze.txt", max_length=25)
-    perfect: bool = True
-    seed: int = Field(ge=0)
+    perfect: bool = False
+    seed: int = Field(default=42, ge=0)
 
     @model_validator(mode='after')
     def config_validation_rules(self) -> "Config":
@@ -42,24 +42,16 @@ class Config(BaseModel):
         if (self.output_file == ""):
             self.output_file = "output_maze.txt"
             print("Output file cannot be empty, using default 'maze.txt'.")
-        if (self.entry[0] > self.width):
+        if (self.entry[0] >= self.width or self.entry[0] < 0):
             raise ValueError("Entry out of bounds.")
-        if (self.entry[1] > self.height):
+        if (self.entry[1] >= self.height or self.entry[1] < 0):
             raise ValueError("Entry out of bounds.")
-        if (self.exit[0] > self.width):
+        if (self.exit[0] >= self.width or self.exit[0] < 0):
             raise ValueError("Exit out of bounds.")
-        if (self.exit[1] > self.height):
+        if (self.exit[1] >= self.height or self.exit[1] < 0):
             raise ValueError("Exit out of bounds.")
         if (self.entry[0] == self.exit[0] and self.entry[1] == self.exit[1]):
             raise ValueError("Entry and exit cannot be the same cell.")
-        if (self.entry[0] == 0 or self.entry[0] == self.width):
-            raise ValueError("Entry cannot be at the border of the maze.")
-        if (self.entry[1] == 0 or self.entry[1] == self.height):
-            raise ValueError("Entry cannot be at the border of the maze.")
-        if (self.exit[0] == 0 or self.exit[0] == self.width):
-            raise ValueError("Exit cannot be at the border of the maze.")
-        if (self.exit[1] == 0 or self.exit[1] == self.height):
-            raise ValueError("Exit cannot be at the border of the maze.")
         return self
 
 

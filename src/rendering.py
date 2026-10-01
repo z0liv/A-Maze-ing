@@ -1,8 +1,9 @@
-from .generator import Cell
+from .generator import Cell, MazeGenerator
 from .enums import COLOR
 from .generator import MazeGenerator
 from .algorithms import generate_maze_dfs
 from .export import export_maze
+from .themes import THEMES
 from mlx import Mlx
 from typing import Any
 import random
@@ -32,7 +33,7 @@ class View:
 
     image_data: Any
     size_line: int
-    ptr: tuple[int | None, ...]
+    ptr: tuple[int | None, ...] # [mlx, win, image]
     mlx: Mlx
 
     def __init__(
@@ -44,7 +45,7 @@ class View:
             v_margin: int,
             wall_size: int,
             grid: list[list[Cell]],
-            theme: dict[str, COLOR],
+            theme: tuple[str, dict[str, COLOR]],
     ) -> None:
         """
         Initialize the view with the attributes defined previously.
@@ -58,7 +59,7 @@ class View:
         self.grid = grid
         self.theme = theme
 
-    def key_handler(self, keycode: int, mlx: Mlx, win_ptr: int | None) -> None:
+    def key_handler(self, keycode: int, ptr: tuple[int | None, ...]) -> None:
         """
         Handles the user interactions through specific keys
         """
@@ -69,13 +70,36 @@ class View:
             export_maze(mazegen)
             self.draw_and_show(
                 self.image_data, self.size_line, self.mlx, self.ptr)
+            self.redraw_maze(False)
         elif keycode == 50 or keycode == 65433:
             print("Option 2 selected\nShow / Hide the shortest path")
         elif keycode == 51 or keycode == 65435:
-            print("Option 3 selected\nRotate the wall colours")
+            bg = self.theme[1]["background"]
+            primary = self.theme[1]["walls"]
+            self.theme[1]['background'] = primary
+            self.theme[1]['walls'] = bg
+            self.redraw_maze(True)
         elif keycode == 52 or keycode == 65430:
-            print("Option 4 selected\nExit")
-            os._exit(0)
+            if self.theme[0] == 'nostromo':
+                self.theme = THEMES[1]
+            elif self.theme[0] == 'nautilus':
+                self.theme = THEMES[2]
+            else:
+                self.theme = THEMES[0]
+            self.redraw_maze(True)
+        elif keycode == 53 or keycode == 65437:
+            print("Exit")
+            self.mlx.mlx_loop_exit(ptr[0])
+
+
+    def redraw_maze(self, seed: bool) -> None:
+        mazegen: MazeGenerator = MazeGenerator()
+        rnd = random.Random(seed)
+        mazegen.use_seed = seed
+        self.grid = generate_maze_dfs(mazegen, rnd)
+        export_maze(mazegen)
+        self.draw_and_show(
+            self.image_data, self.size_line, self.mlx, self.ptr)
 
     def generate_view(self) -> None:
         """
@@ -83,12 +107,12 @@ class View:
         and draws the maze along with the user interaction options.
         """
         image_data, size_line, mlx, ptr = self.initialize_image()
-        self.draw_and_show(image_data, size_line, mlx, ptr)
+        self.draw_and_show(image_data, size_line, mlx, ptr  )
 
     def draw_and_show(self, image_data: Any, size_line: int, mlx: Mlx,
                       ptr: tuple[int | None, ...]) -> None:
-        self.draw_complete_grid(image_data, size_line)
         self.write_options(mlx, ptr)
+        self.draw_complete_grid(image_data, size_line)
         self.show_image(mlx, ptr)
 
     def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
@@ -119,16 +143,16 @@ class View:
         """
         wall_size = self.wall_size
         self.draw_pixel(row, cell, i, j,
-                        image_data, size_line, self.theme["background"])
+                        image_data, size_line, self.theme[1]["background"])
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["pattern"])
+                            image_data, size_line, self.theme[1]["pattern"])
         elif (cell.is_entry):
             self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["entry"])
+                            image_data, size_line, self.theme[1]["entry"])
         elif (cell.is_exit):
             self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["exit"])
+                            image_data, size_line, self.theme[1]["exit"])
 
         # define maze borders
         top: bool = (self.grid.index(row) == 0 and i <= wall_size * 2)
@@ -146,7 +170,7 @@ class View:
         # if we are in a cell corner that has a wall close, draw
         if (self.check_corner(row, cell, i, j)):
             self.draw_pixel(row, cell, i, j, image_data, size_line,
-                            self.theme["walls"])
+                            self.theme[1]["walls"])
 
         # if we are in a cell wall and the wall is placed, draw
         if ((i < self.wall_size and (cell.walls >> 0) & 1)  # top wall
@@ -156,7 +180,7 @@ class View:
                 or (j >= self.cell_size - self.wall_size
                     and (cell.walls >> 1) & 1)):  # right wall
             self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme["walls"])
+                            image_data, size_line, self.theme[1]["walls"])
 
         # restart wall size if altered
         if (self.wall_size != wall_size):
@@ -262,19 +286,19 @@ class View:
         Function that writes the user interaction texts into the window.
         """
         options: list[str] = [
-            "=== A-Maze-ing ===",
             "1. Re-generate a new maze",
             "2. Show / Hide the shortest path",
             "3. Rotate the wall colours",
-            "4. Quit",
+            "4. Switch theme",
+            "5. Exit",
         ]
-        i: float = 5
+        i = 5
         for opt in options:
             mlx.mlx_string_put(ptr[0],
                                ptr[1],
                                int(self.h_margin / 2),
                                self.window_height - (self.cell_size * i),
-                               0xFFFFFFFF,  # ARGB
+                               0xFFFFFFFF,
                                opt)
             i -= 1
 
@@ -287,7 +311,7 @@ class View:
                                     int(self.h_margin / 2))
 
         def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum, mlx, ptr[1])
+            self.key_handler(keynum, ptr)
 
         def on_destroy(_: Any) -> None:
             mlx.mlx_loop_exit(ptr[0])
