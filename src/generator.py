@@ -19,6 +19,7 @@ class Cell:
     is_pattern: bool
     is_entry: bool
     is_exit: bool
+    in_solution: bool = False
 
     def __init__(
             self, position: tuple[int, int],

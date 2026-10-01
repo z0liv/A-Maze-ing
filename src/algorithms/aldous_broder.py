@@ -1,10 +1,12 @@
 import random
 from ..generator import MazeGenerator, Cell
-from .alg_utils import get_free_cells, get_neighbors, opposite
+from .alg_utils import get_free_cells, get_neighbours, opposite
 
 
-def generate_maze_ab(mazegen: MazeGenerator,
-                     rnd: random.Random) -> list[list[Cell]]:
+def genmaze_ab(
+        mazegen: MazeGenerator,
+        rnd: random.Random
+) -> list[list[Cell]]:
     """
         Generate the maze using the Aldous-Broder algorithm.
 
@@ -17,8 +19,8 @@ def generate_maze_ab(mazegen: MazeGenerator,
     visited_cells = 1
     total_cells = get_free_cells(mazegen)
     while visited_cells < total_cells:
-        neighbors = get_neighbors(current_cell, mazegen.grid)
-        next_cell, direction = rnd.choice(neighbors)
+        neighbours = get_neighbours(current_cell, mazegen.grid)
+        next_cell, direction = rnd.choice(neighbours)
         if not next_cell.visited:
             current_cell.walls &= ~direction.value
             next_cell.walls &= ~opposite(direction).value

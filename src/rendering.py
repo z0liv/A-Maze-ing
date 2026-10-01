@@ -1,6 +1,6 @@
 from .generator import Cell, MazeGenerator
 from .enums import COLOR
-from .algorithms import generate_maze_ab, generate_maze_dfs
+from .algorithms import genmaze_ab, genmaze_dfs
 from .export import export_maze
 from .themes import THEMES
 from mlx import Mlx
@@ -90,9 +90,9 @@ class View:
         self.mazegen = MazeGenerator()
         rnd = random.Random()
         if self.mazegen.config.algorithm == "ab":
-            self.grid = generate_maze_ab(self.mazegen, rnd)
+            self.grid = genmaze_ab(self.mazegen, rnd)
         else:
-            self.grid = generate_maze_dfs(self.mazegen, rnd)
+            self.grid = genmaze_dfs(self.mazegen, rnd)
         export_maze(self.mazegen)
         self.draw_and_show(
             self.image_data, self.size_line, self.mlx, self.ptr)

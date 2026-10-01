@@ -2,68 +2,103 @@ from ..generator import MazeGenerator, Cell
 from ..enums import DIRECTION
 
 
-def get_neighbors(
+def get_neighbours(
         cell: Cell,
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
     """
-        Get the neighbors of a given cell in the grid.
+        Get the neighbours of a given cell in the grid.
 
         Args:
-            cell (Cell): The cell for which to find neighbors.
+            cell (Cell): The cell for which to find neighbours.
             grid (list[list[Cell]]): The grid of cells.
 
         Returns:
             A list of neighboring Cell objects.
     """
     x, y = cell.position
-    neighbors: list[tuple[Cell, DIRECTION]] = []
+    neighbours: list[tuple[Cell, DIRECTION]] = []
 
     # Check the four cardinal directions
     if y > 0 and not grid[y - 1][x].is_pattern:  # North
-        neighbors.append((grid[y - 1][x], DIRECTION.NORTH))
+        neighbours.append((grid[y - 1][x], DIRECTION.NORTH))
     if x < len(grid[0]) - 1 and not grid[y][x + 1].is_pattern:  # East
-        neighbors.append((grid[y][x + 1], DIRECTION.EAST))
+        neighbours.append((grid[y][x + 1], DIRECTION.EAST))
     if y < len(grid) - 1 and not grid[y + 1][x].is_pattern:  # South
-        neighbors.append((grid[y + 1][x], DIRECTION.SOUTH))
+        neighbours.append((grid[y + 1][x], DIRECTION.SOUTH))
     if x > 0 and not grid[y][x - 1].is_pattern:  # West
-        neighbors.append((grid[y][x - 1], DIRECTION.WEST))
+        neighbours.append((grid[y][x - 1], DIRECTION.WEST))
 
-    return neighbors
+    return neighbours
 
 
-def get_unvisited_neighbors(
+def get_unvisited_neighbours(
         cell: Cell,
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
     """
-        Get the neighbors of a given cell in the grid.
+        Get the neighbours of a given cell in the grid.
 
         Args:
-            cell (Cell): The cell for which to find neighbors.
+            cell (Cell): The cell for which to find neighbours.
             grid (list[list[Cell]]): The grid of cells.
 
         Returns:
             A list of neighboring Cell objects.
     """
     x, y = cell.position
-    neighbors: list[tuple[Cell, DIRECTION]] = []
+    neighbours: list[tuple[Cell, DIRECTION]] = []
 
     # Check the four cardinal directions
     if (y > 0 and not grid[y - 1][x].is_pattern
             and not grid[y - 1][x].visited):  # North
-        neighbors.append((grid[y - 1][x], DIRECTION.NORTH))
+        neighbours.append((grid[y - 1][x], DIRECTION.NORTH))
     if (x < len(grid[0]) - 1 and not grid[y][x + 1].is_pattern
             and not grid[y][x + 1].visited):  # East
-        neighbors.append((grid[y][x + 1], DIRECTION.EAST))
+        neighbours.append((grid[y][x + 1], DIRECTION.EAST))
     if (y < len(grid) - 1 and not grid[y + 1][x].is_pattern
             and not grid[y + 1][x].visited):  # South
-        neighbors.append((grid[y + 1][x], DIRECTION.SOUTH))
+        neighbours.append((grid[y + 1][x], DIRECTION.SOUTH))
     if (x > 0 and not grid[y][x - 1].is_pattern
             and not grid[y][x - 1].visited):  # West
-        neighbors.append((grid[y][x - 1], DIRECTION.WEST))
+        neighbours.append((grid[y][x - 1], DIRECTION.WEST))
 
-    return neighbors
+    return neighbours
+
+
+def get_connected_neighbours(
+        cell: Cell,
+        grid: list[list[Cell]]
+) -> list[tuple[Cell, DIRECTION]]:
+    neighbours = []
+
+    x, y = cell.position
+
+    if y > 0:
+        north = grid[y - 1][x]
+
+        if not (cell.walls & DIRECTION.NORTH.value):
+            neighbours.append((north, DIRECTION.NORTH))
+
+    if x < len(grid[0]) - 1:
+        east = grid[y][x + 1]
+
+        if not (cell.walls & DIRECTION.EAST.value):
+            neighbours.append((east, DIRECTION.EAST))
+
+    if y < len(grid) - 1:
+        south = grid[y + 1][x]
+
+        if not (cell.walls & DIRECTION.SOUTH.value):
+            neighbours.append((south, DIRECTION.SOUTH))
+
+    if x > 0:
+        west = grid[y][x - 1]
+
+        if not (cell.walls & DIRECTION.WEST.value):
+            neighbours.append((west, DIRECTION.WEST))
+
+    return neighbours
 
 
 def get_free_cells(mazegen: MazeGenerator) -> int:
@@ -84,6 +119,30 @@ def get_free_cells(mazegen: MazeGenerator) -> int:
             if not cell.is_pattern:
                 count += 1
     return count
+
+
+def unvisit_all_cells(mazegen: MazeGenerator) -> None:
+    """
+    Loops inside the grid to unvisit all the cells inside.
+
+    Arguments:
+        mazegen (MazeGenerator): MazeGenerator class that contains the grid.
+    """
+    for row in mazegen.grid:
+        for cell in row:
+            if not cell.is_entry or not cell.is_pattern:
+                cell.visited = False
+
+
+def active_solution_path(solution: list[Cell]) -> None:
+    """
+    Loops inside the list of cells changing the in_solution bool.
+
+    Arguments:
+        mazegen (MazeGenerator): MazeGenerator class that contains the grid.
+    """
+    for cell in solution:
+        cell.in_solution = True
 
 
 def opposite(direction: DIRECTION) -> DIRECTION:
