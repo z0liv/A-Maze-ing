@@ -1,5 +1,5 @@
 from random import Random
-from ..generator import MazeGenerator, Cell
+from .. import MazeGenerator, Cell
 from .alg_utils import get_unvisited_neighbours, opposite
 
 

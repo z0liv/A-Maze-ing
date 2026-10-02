@@ -1,5 +1,5 @@
 import random
-from ..generator import MazeGenerator, Cell
+from .. import MazeGenerator, Cell
 from .alg_utils import get_free_cells, get_neighbours, opposite
 
 

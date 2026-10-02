@@ -1,4 +1,4 @@
-from ..generator import MazeGenerator, Cell
+from .. import MazeGenerator, Cell
 from ..enums import DIRECTION
 
 
@@ -142,7 +142,7 @@ def unvisit_all_cells(mazegen: MazeGenerator) -> None:
     """
     for row in mazegen.grid:
         for cell in row:
-            if not cell.is_entry or not cell.is_pattern:
+            if not cell.is_pattern:
                 cell.visited = False
 
 

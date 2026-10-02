@@ -1,4 +1,4 @@
-from ..generator import MazeGenerator, Cell
+from .. import MazeGenerator, Cell
 from .alg_utils import get_connected_neighbours, unvisit_all_cells
 
 

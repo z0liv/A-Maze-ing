@@ -1,8 +1,6 @@
-from src.generator import MazeGenerator
+from src import MazeGenerator, genmaze_ab, genmaze_dfs, solve_maze_bfs, export_maze
 from src.errors import ParamsError, InvalidConfigError
-from src.algorithms import genmaze_ab, genmaze_dfs, solve_maze_bfs
 from src.rendering import View
-from src.export import export_maze
 import random
 
 

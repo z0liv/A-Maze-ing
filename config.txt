@@ -1,8 +1,8 @@
 WIDTH=10
 HEIGHT=10
 ENTRY=0,0
-PERFECT=False
 EXIT=9,9
+PERFECT=False
 OUTPUT_FILE=maze.txt
 # available maze generating algorithms (Aldous broder, Deep first search): ab, dfs
 ALGORITHM=ab

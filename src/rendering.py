@@ -1,7 +1,5 @@
-from .generator import Cell, MazeGenerator
+from .mazegen import MazeGenerator, Cell, genmaze_ab, genmaze_dfs, export_maze
 from .enums import COLOR
-from .algorithms import genmaze_ab, genmaze_dfs
-from .export import export_maze
 from .themes import THEMES
 from mlx import Mlx
 from typing import Any
