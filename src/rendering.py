@@ -30,32 +30,24 @@ class View:
                maze.
     """
 
+    horizontal_margin: int = 100
+    vertical_margin: int = 380
+    cell_size: int = 50
+    wall_size: int = 2
     image_data: Any
     size_line: int
     ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
+    theme: tuple[str, dict[str, COLOR]] = THEMES[0]
 
-    def __init__(
-            self,
-            window_width: int,
-            window_height: int,
-            cell_size: int,
-            h_margin: int,
-            v_margin: int,
-            wall_size: int,
-            theme: tuple[str, dict[str, COLOR]],
-            mazegen: MazeGenerator
-    ) -> None:
+    def __init__(self, mazegen: MazeGenerator) -> None:
         """
         Initialize the view with the attributes defined previously.
         """
-        self.window_width = window_width
-        self.window_height = window_height
-        self.cell_size = cell_size
-        self.h_margin = h_margin
-        self.v_margin = v_margin
-        self.wall_size = wall_size
-        self.theme = theme
+        self.window_width = (mazegen.config.width * self.cell_size
+                             + self.horizontal_margin)
+        self.window_height = (mazegen.config.height * self.cell_size
+                              + self.vertical_margin)
         self.mazegen = mazegen
 
     def key_handler(self, keycode: int, ptr: tuple[int | None, ...]) -> None:
@@ -298,7 +290,7 @@ class View:
         for opt in options:
             mlx.mlx_string_put(ptr[0],
                                ptr[1],
-                               int(self.h_margin / 2),
+                               int(self.horizontal_margin / 2),
                                self.window_height - (self.cell_size * i),
                                0xFFFFFFFF,
                                opt)
@@ -309,8 +301,8 @@ class View:
         Set the image in the window and add the key handler to it.
         """
         mlx.mlx_put_image_to_window(ptr[0], ptr[1], ptr[2],
-                                    int(self.h_margin / 2),
-                                    int(self.h_margin / 2))
+                                    int(self.horizontal_margin / 2),
+                                    int(self.horizontal_margin / 2))
 
         def on_key(keynum: int, _: Any) -> None:
             self.key_handler(keynum, ptr)

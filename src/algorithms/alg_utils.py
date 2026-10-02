@@ -70,7 +70,7 @@ def get_connected_neighbours(
         cell: Cell,
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
-    neighbours = []
+    neighbours: list[tuple[Cell, DIRECTION]] = []
 
     x, y = cell.position
 
