@@ -10,6 +10,37 @@ import os
 
 
 class View:
+
+    """
+    This class represents the view of the proyect, which manages everything
+    related to the drawing and event handling with mlx
+
+    Attributes:
+        horizontal_margin (int): An integer that stores, in pixels,
+            the needed margin within the window on the x axis
+        vertical_margin (int): An integer that stores, in pixels,
+            the needed margin within the window on the y axis
+        cell_size (int): An integer that stores the size of the cells in pixels
+        wall_sise (int): An integer that stores the size of each maze wall in
+            pixels
+        size_line (int): An integer that stores the size of a line of pixels
+        ptr (tuple[int | None, ...]): A tuple of mlx pointers
+        mlx (Mlx): The mlx object
+        theme (tuple[str, dict[str, COLOR]]) : A tuple that stores the name of
+            the theme and a dict that stores maze part name as the key and the
+            color of it as the value.
+    """
+
+    horizontal_margin: int = 100
+    vertical_margin: int = 380
+    cell_size: int = 50
+    wall_size: int = 2
+    image_data: Any
+    size_line: int
+    ptr: tuple[int | None, ...]  # [mlx, win, image]
+    mlx: Mlx
+    theme: tuple[str, dict[str, COLOR]] = THEMES[0]
+
     """
     Initialize the maze view.
 
@@ -30,16 +61,6 @@ class View:
                maze.
     """
 
-    horizontal_margin: int = 100
-    vertical_margin: int = 380
-    cell_size: int = 50
-    wall_size: int = 2
-    image_data: Any
-    size_line: int
-    ptr: tuple[int | None, ...]  # [mlx, win, image]
-    mlx: Mlx
-    theme: tuple[str, dict[str, COLOR]] = THEMES[0]
-
     def __init__(self, mazegen: MazeGenerator) -> None:
         """
         Initialize the view with the attributes defined previously.
@@ -50,7 +71,7 @@ class View:
                               + self.vertical_margin)
         self.mazegen = mazegen
 
-    def key_handler(self, keycode: int, ptr: tuple[int | None, ...]) -> None:
+    def key_handler(self, keycode: int) -> None:
         """
         Handles the user interactions through specific keys
         """
@@ -63,8 +84,7 @@ class View:
             primary = self.theme[1]["walls"]
             self.theme[1]['background'] = primary
             self.theme[1]['walls'] = bg
-            self.draw_and_show(
-                self.image_data, self.size_line, self.mlx, self.ptr)
+            self.draw_and_show()
         elif keycode == 52 or keycode == 65430:
             if self.theme[0] == 'nostromo':
                 self.theme = THEMES[1]
@@ -72,13 +92,16 @@ class View:
                 self.theme = THEMES[2]
             else:
                 self.theme = THEMES[0]
-            self.draw_and_show(
-                self.image_data, self.size_line, self.mlx, self.ptr)
+            self.draw_and_show()
         elif keycode == 53 or keycode == 65437:
             print("Exit")
-            self.mlx.mlx_loop_exit(ptr[0])
+            self.mlx.mlx_loop_exit(self.ptr[0])
 
     def redo_maze(self) -> None:
+        """
+        Creates new maze generator and random objects and calls the algorithm,
+        the export function and the function that draws and shows the maze
+        """
         self.mazegen = MazeGenerator()
         rnd = random.Random()
         if self.mazegen.config.algorithm == "ab":
@@ -86,36 +109,36 @@ class View:
         else:
             self.grid = genmaze_dfs(self.mazegen, rnd)
         export_maze(self.mazegen)
-        self.draw_and_show(
-            self.image_data, self.size_line, self.mlx, self.ptr)
+        self.draw_and_show()
 
     def generate_view(self) -> None:
         """
         The main method of the class, initializes the window and the image,
         and draws the maze along with the user interaction options.
         """
-        image_data, size_line, mlx, ptr = self.initialize_image()
-        self.draw_and_show(image_data, size_line, mlx, ptr)
+        self.initialize_image()
+        self.draw_and_show()
 
-    def draw_and_show(
-        self, image_data: Any, size_line: int, mlx: Mlx,
-        ptr: tuple[int | None, ...]
-    ) -> None:
-        self.write_options(mlx, ptr)
-        self.draw_complete_grid(image_data, size_line)
-        self.show_image(mlx, ptr)
+    def draw_and_show(self) -> None:
+        """
+        Calls the fucntion that writes the user interaction options, then the
+        one that draws the grid, finally the one that shows the image that
+        contains all the prevoiusly drawn pixels.
+        """
+        self.write_options()
+        self.draw_complete_grid()
+        self.show_image()
 
-    def draw_complete_grid(self, image_data: Any, size_line: int) -> None:
+    def draw_complete_grid(self) -> None:
         """
         For each pixel in each cell, calls a function that decides if the pixel
-        needs to be drawn
+        needs to be drawn.
         """
         for row in self.mazegen.grid:
             for cell in row:
                 for i in range(self.cell_size):
                     for j in range(self.cell_size):
-                        self.draw_all_pixels(
-                            row, cell, i, j, image_data, size_line)
+                        self.draw_all_pixels(row, cell, i, j)
 
     def draw_all_pixels(
         self,
@@ -123,8 +146,6 @@ class View:
         cell: Cell,
         i: int,
         j: int,
-        image_data: Any,
-        size_line: int
     ) -> None:
         """
         First draws every pixel with the background color,
@@ -132,17 +153,13 @@ class View:
         then draws the walls with the specified color in the theme.
         """
         wall_size = self.wall_size
-        self.draw_pixel(row, cell, i, j,
-                        image_data, size_line, self.theme[1]["background"])
+        self.draw_pixel(row, cell, i, j, self.theme[1]["background"])
         if (cell.is_pattern):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme[1]["pattern"])
+            self.draw_pixel(row, cell, i, j, self.theme[1]["pattern"])
         elif (cell.is_entry):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme[1]["entry"])
+            self.draw_pixel(row, cell, i, j, self.theme[1]["entry"])
         elif (cell.is_exit):
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme[1]["exit"])
+            self.draw_pixel(row, cell, i, j, self.theme[1]["exit"])
 
         # define maze borders
         top: bool = (self.mazegen.grid.index(row) == 0 and i <= wall_size * 2)
@@ -161,8 +178,7 @@ class View:
 
         # if we are in a cell corner that has a wall close, draw
         if (self.check_corner(row, cell, i, j)):
-            self.draw_pixel(row, cell, i, j, image_data, size_line,
-                            self.theme[1]["walls"])
+            self.draw_pixel(row, cell, i, j, self.theme[1]["walls"])
 
         # if we are in a cell wall and the wall is placed, draw
         if ((i < self.wall_size and (cell.walls >> 0) & 1)  # top wall
@@ -171,19 +187,18 @@ class View:
                 or (j < self.wall_size and (cell.walls >> 3) & 1)  # left wall
                 or (j >= self.cell_size - self.wall_size
                     and (cell.walls >> 1) & 1)):  # right wall
-            self.draw_pixel(row, cell, i, j,
-                            image_data, size_line, self.theme[1]["walls"])
+            self.draw_pixel(row, cell, i, j, self.theme[1]["walls"])
 
         # restart wall size if altered
         if (self.wall_size != wall_size):
             self.wall_size //= 2
 
-    def offset(self, x: int, y: int, size_line: int) -> int:
+    def offset(self, x: int, y: int) -> int:
         """
         Calculates the position of the pixel according to the size of a pixel
         and the size of each line.
         """
-        return y * size_line + x * 4
+        return y * self.size_line + x * 4
 
     def draw_pixel(
             self,
@@ -191,8 +206,6 @@ class View:
             cell: Cell,
             i: int,
             j: int,
-            image_data: Any,
-            size_line: int,
             color: COLOR
     ) -> None:
         """
@@ -201,8 +214,8 @@ class View:
         """
         px = row.index(cell) * self.cell_size + j
         py = self.mazegen.grid.index(row) * self.cell_size + i
-        start = self.offset(px, py, size_line)
-        image_data[start:start + 4] = bytes(color.value)
+        start = self.offset(px, py)
+        self.image_data[start:start + 4] = bytes(color.value)
 
     def check_corner(
             self,
@@ -255,9 +268,7 @@ class View:
                     return True
         return False
 
-    def initialize_image(self) -> tuple[
-        Any, int, Mlx, tuple[int | None, ...]
-    ]:
+    def initialize_image(self) -> None:
         """
         Initializes the graphics, the window and the image with its data.
         """
@@ -273,9 +284,8 @@ class View:
         self.image_data, _, self.size_line, _ = self.mlx.mlx_get_data_addr(
             img_ptr)
         self.ptr = (mlx_ptr, win_ptr, img_ptr)
-        return self.image_data, self.size_line, self.mlx, self.ptr
 
-    def write_options(self, mlx: Mlx, ptr: tuple[int | None, ...]) -> None:
+    def write_options(self) -> None:
         """
         Function that writes the user interaction texts into the window.
         """
@@ -288,29 +298,29 @@ class View:
         ]
         i = 5
         for opt in options:
-            mlx.mlx_string_put(ptr[0],
-                               ptr[1],
-                               int(self.horizontal_margin / 2),
-                               self.window_height - (self.cell_size * i),
-                               0xFFFFFFFF,
-                               opt)
+            self.mlx.mlx_string_put(self.ptr[0],
+                                    self.ptr[1],
+                                    int(self.horizontal_margin / 2),
+                                    self.window_height - (self.cell_size * i),
+                                    0xFFFFFFFF,
+                                    opt)
             i -= 1
 
-    def show_image(self, mlx: Mlx, ptr: tuple[int | None, ...]) -> None:
+    def show_image(self) -> None:
         """
         Set the image in the window and add the key handler to it.
         """
-        mlx.mlx_put_image_to_window(ptr[0], ptr[1], ptr[2],
-                                    int(self.horizontal_margin / 2),
-                                    int(self.horizontal_margin / 2))
+        self.mlx.mlx_put_image_to_window(self.ptr[0], self.ptr[1], self.ptr[2],
+                                         int(self.horizontal_margin / 2),
+                                         int(self.horizontal_margin / 2))
 
         def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum, ptr)
+            self.key_handler(keynum)
 
         def on_destroy(_: Any) -> None:
-            mlx.mlx_loop_exit(ptr[0])
+            self.mlx.mlx_loop_exit(self.ptr[0])
         stuff = [1, 2]
-        mlx.mlx_key_hook(ptr[1], on_key, stuff)
-        mlx.mlx_hook(ptr[1], 33, 0, on_destroy, None)
-        mlx.mlx_loop(ptr[0])
+        self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
+        self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
+        self.mlx.mlx_loop(self.ptr[0])
         os._exit(0)

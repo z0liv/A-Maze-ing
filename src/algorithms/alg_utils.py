@@ -7,14 +7,14 @@ def get_neighbours(
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
     """
-        Get the neighbours of a given cell in the grid.
+    Get the neighbours of a given cell in the grid.
 
-        Args:
-            cell (Cell): The cell for which to find neighbours.
-            grid (list[list[Cell]]): The grid of cells.
+    Args:
+        cell (Cell): The cell for which to find neighbours.
+        grid (list[list[Cell]]): The grid of cells.
 
-        Returns:
-            A list of neighboring Cell objects.
+    Returns:
+        A list of neighboring Cell objects.
     """
     x, y = cell.position
     neighbours: list[tuple[Cell, DIRECTION]] = []
@@ -37,14 +37,15 @@ def get_unvisited_neighbours(
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
     """
-        Get the neighbours of a given cell in the grid.
+    Get the unvisited neighbours of a given cell in the grid.
 
-        Args:
-            cell (Cell): The cell for which to find neighbours.
-            grid (list[list[Cell]]): The grid of cells.
+    Args:
+        cell (Cell): The cell for which to find neighbours.
+        grid (list[list[Cell]]): The grid of cells.
 
-        Returns:
-            A list of neighboring Cell objects.
+    Returns:
+        A list of tuples with the neighboring Cell objects and the direction
+        in which the neighbour is.
     """
     x, y = cell.position
     neighbours: list[tuple[Cell, DIRECTION]] = []
@@ -70,6 +71,17 @@ def get_connected_neighbours(
         cell: Cell,
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
+    """
+    Get the connected neighbours of a given cell in the grid. Connected meaning
+    that the wall between both cells is not active.
+
+    Args:
+        cell (Cell): The cell for which to find neighbours.
+        grid (list[list[Cell]]): The grid of cells.
+
+    Returns:
+        A list of neighboring Cell objects.
+    """
     neighbours: list[tuple[Cell, DIRECTION]] = []
 
     x, y = cell.position
@@ -106,7 +118,7 @@ def get_free_cells(mazegen: MazeGenerator) -> int:
     Function that counts how many cells in the grid are not part of
     the '42' pattern.
 
-    Parameters:
+    Args:
         mazegen (MazeGenerator): MazeGenerator object that stores the
         relevant information of the maze.
     Returns:
@@ -138,7 +150,7 @@ def active_solution_path(solution: list[Cell]) -> None:
     """
     Loops inside the list of cells changing the in_solution bool.
 
-    Arguments:
+    Args:
         mazegen (MazeGenerator): MazeGenerator class that contains the grid.
     """
     for cell in solution:
@@ -147,14 +159,14 @@ def active_solution_path(solution: list[Cell]) -> None:
 
 def opposite(direction: DIRECTION) -> DIRECTION:
     """
-        Get the opposite direction of a given direction.
+    Get the opposite direction of a given direction.
 
-        Args:
-            direction (DIRECTION): The direction for which
-            to find the opposite.
+    Args:
+        direction (DIRECTION): The direction for which
+        to find the opposite.
 
-        Returns:
-            The opposite DIRECTION.
+    Returns:
+        The opposite DIRECTION.
     """
     if direction == DIRECTION.NORTH:
         return DIRECTION.SOUTH

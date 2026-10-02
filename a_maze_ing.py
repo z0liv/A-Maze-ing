@@ -8,7 +8,6 @@ import random
 
 def main() -> None:
     try:
-        
         mazegen: MazeGenerator = MazeGenerator()
         rnd = random.Random()
         if mazegen.config.algorithm == "ab":
