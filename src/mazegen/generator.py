@@ -1,6 +1,11 @@
+from random import Random
 from ..config import Config, load_config_model
 from ..errors import InvalidConfigError
+from .algorithms import (
+    genmaze_ab, genmaze_dfs,
+    solve_maze_bfs, active_solution_path)
 from .cell import Cell
+from .export import export_maze
 
 
 class MazeGenerator:
@@ -50,6 +55,20 @@ class MazeGenerator:
         self.exit = self.grid[exit_y][exit_x]
 
         self.entry.visited = True
+
+        self.generate()
+
+    def generate(self) -> None:
+        rnd = Random(self.config.seed)
+
+        if self.config.algorithm == "ab":
+            self.grid = genmaze_ab(self.grid, self.entry, rnd)
+        else:
+            self.grid = genmaze_dfs(self.grid, self.entry, rnd)
+        self.solution = solve_maze_bfs(self.grid, self.entry, self.exit)
+
+        active_solution_path(self.solution)
+        export_maze(self.grid, self.config, self.solution)
 
 
 def generate_grid(config: Config) -> list[list[Cell]]:

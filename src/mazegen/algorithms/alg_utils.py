@@ -1,4 +1,4 @@
-from .. import MazeGenerator, Cell
+from .. import Cell
 from ..enums import DIRECTION
 
 
@@ -113,7 +113,7 @@ def get_connected_neighbours(
     return neighbours
 
 
-def get_free_cells(mazegen: MazeGenerator) -> int:
+def get_free_cells(grid: list[list[Cell]]) -> int:
     """
     Function that counts how many cells in the grid are not part of
     the '42' pattern.
@@ -126,21 +126,21 @@ def get_free_cells(mazegen: MazeGenerator) -> int:
         of the '42' pattern.
     """
     count: int = 0
-    for row in mazegen.grid:
+    for row in grid:
         for cell in row:
             if not cell.is_pattern:
                 count += 1
     return count
 
 
-def unvisit_all_cells(mazegen: MazeGenerator) -> None:
+def unvisit_all_cells(grid: list[list[Cell]]) -> None:
     """
     Loops inside the grid to unvisit all the cells inside.
 
     Arguments:
         mazegen (MazeGenerator): MazeGenerator class that contains the grid.
     """
-    for row in mazegen.grid:
+    for row in grid:
         for cell in row:
             if not cell.is_pattern:
                 cell.visited = False

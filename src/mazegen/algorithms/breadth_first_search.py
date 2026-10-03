@@ -1,24 +1,23 @@
-from .. import MazeGenerator, Cell
+from .. import Cell
 from .alg_utils import get_connected_neighbours, unvisit_all_cells
 
 
-def solve_maze_bfs(mazegen: MazeGenerator) -> list[Cell]:
-
-    entry = mazegen.entry
-    exit = mazegen.exit
+def solve_maze_bfs(
+        grid: list[list[Cell]], entry: Cell, exit: Cell
+) -> list[Cell]:
 
     frontier: list[Cell] = [entry]
     visited: set[Cell] = {entry}
     parent: dict[Cell, Cell] = {}
 
-    unvisit_all_cells(mazegen)
+    unvisit_all_cells(grid)
     while frontier:
         selected_cell: Cell = frontier.pop(0)
 
         if selected_cell == exit:
             break
 
-        neighbours = get_connected_neighbours(selected_cell, mazegen.grid)
+        neighbours = get_connected_neighbours(selected_cell, grid)
 
         for neighbour, _ in neighbours:
             if neighbour not in visited:

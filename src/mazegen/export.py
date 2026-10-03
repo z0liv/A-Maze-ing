@@ -1,21 +1,46 @@
-from .generator import MazeGenerator
+from ..config import Config
+from .cell import Cell
 
 
-def export_maze(mazegen: MazeGenerator) -> None:
+def export_maze(
+        grid: list[list[Cell]], config: Config, solution: list[Cell]
+) -> None:
     """
     Function that writes the maze information into the
     output file given by the mazegen.config.
     """
     try:
-        with open(mazegen.config.output_file, "w") as file:
-            content = list_content(mazegen)
+        with open(config.output_file, "w") as file:
+            content = list_content(grid, config, solution)
             for element in content:
                 file.write(element)
     except PermissionError as e:
         print(e)
 
 
-def list_content(mazegen: MazeGenerator) -> list[str]:
+def get_solution_directions(solution: list[Cell]) -> str:
+    result: str = ""
+    current = solution[0]
+    for next in solution[1:]:
+        if (next.position[1] < current.position[1]
+                and next.position[0] == current.position[0]):
+            result += "N"
+        elif (next.position[1] > current.position[1]
+              and next.position[0] == current.position[0]):
+            result += "S"
+        elif (next.position[0] < current.position[0]
+              and next.position[1] == current.position[1]):
+            result += "W"
+        elif (next.position[0] > current.position[0]
+              and next.position[1] == current.position[1]):
+            result += "E"
+        current = next
+    return result
+
+
+def list_content(
+        grid: list[list[Cell]], config: Config, solution: list[Cell]
+) -> list[str]:
     """
     Format the maze information into the correct output format
     given by the subject.
@@ -35,14 +60,16 @@ def list_content(mazegen: MazeGenerator) -> list[str]:
 
     """
     content: list[str] = list()
-    for row in mazegen.grid:
+    for row in grid:
         for cell in row:
             content.append(hex(cell.walls).removeprefix("0x"))
         content.append("\n")
 
     content.append("\n")
-    content.append(f"{mazegen.config.entry[0]},{mazegen.config.entry[1]}")
+    content.append(f"{config.entry[0]},{config.entry[1]}")
     content.append("\n")
-    content.append(f"{mazegen.config.exit[0]},{mazegen.config.exit[1]}")
+    content.append(f"{config.exit[0]},{config.exit[1]}")
     content.append("\n")
+    content.append(get_solution_directions(solution))
+
     return content

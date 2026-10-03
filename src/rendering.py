@@ -35,6 +35,7 @@ class View:
     wall_size: int = 2
     image_data: Any
     size_line: int
+    show_solution: bool = False
     ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
     theme: tuple[str, dict[str, COLOR]] = THEMES[0]
@@ -76,7 +77,11 @@ class View:
         if keycode == 49 or keycode == 65436:
             self.redo_maze()
         elif keycode == 50 or keycode == 65433:
-            print("Option 2 selected\nShow / Hide the shortest path")
+            if self.show_solution:
+                self.show_solution = False
+            else:
+                self.show_solution = True
+            self.draw_and_show()
         elif keycode == 51 or keycode == 65435:
             bg = self.theme[1]["background"]
             primary = self.theme[1]["walls"]
@@ -103,10 +108,12 @@ class View:
         self.mazegen = MazeGenerator()
         rnd = random.Random()
         if self.mazegen.config.algorithm == "ab":
-            self.grid = genmaze_ab(self.mazegen, rnd)
+            self.grid = genmaze_ab(self.mazegen.grid, self.mazegen.entry, rnd)
         else:
-            self.grid = genmaze_dfs(self.mazegen, rnd)
-        export_maze(self.mazegen)
+            self.grid = genmaze_dfs(self.mazegen.grid, self.mazegen.entry, rnd)
+        export_maze(self.mazegen.grid,
+                    self.mazegen.config,
+                    self.mazegen.solution)
         self.draw_and_show()
 
     def generate_view(self) -> None:
@@ -158,6 +165,8 @@ class View:
             self.draw_pixel(row, cell, i, j, self.theme[1]["entry"])
         elif (cell.is_exit):
             self.draw_pixel(row, cell, i, j, self.theme[1]["exit"])
+        elif (self.show_solution and cell.in_solution):
+            self.draw_pixel(row, cell, i, j, self.theme[1]["solution"])
 
         # define maze borders
         top: bool = (self.mazegen.grid.index(row) == 0 and i <= wall_size * 2)
