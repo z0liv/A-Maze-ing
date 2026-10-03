@@ -162,11 +162,17 @@ class View:
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j, self.theme[1]["pattern"])
         elif (cell.is_entry):
-            self.draw_pixel(row, cell, i, j, self.theme[1]["entry"])
+            if (i > self.wall_size and i < self.cell_size - self.wall_size
+                    and j > self.wall_size and j < self.cell_size - self.wall_size):
+                self.draw_pixel(row, cell, i, j, self.theme[1]["entry"])
         elif (cell.is_exit):
-            self.draw_pixel(row, cell, i, j, self.theme[1]["exit"])
-        elif (self.show_solution and cell.in_solution):
-            self.draw_pixel(row, cell, i, j, self.theme[1]["solution"])
+            if (i > self.wall_size and i < self.cell_size - self.wall_size
+                    and j > self.wall_size and j < self.cell_size - self.wall_size):
+                self.draw_pixel(row, cell, i, j, self.theme[1]["exit"])
+        if (self.show_solution and cell.in_solution):
+            if (i >= self.cell_size // 3 and i < (self.cell_size // 3) * 2
+                    and j >= self.cell_size // 3 and j < (self.cell_size // 3) * 2):
+                self.draw_pixel(row, cell, i, j, self.theme[1]["solution"])
 
         # define maze borders
         top: bool = (self.mazegen.grid.index(row) == 0 and i <= wall_size * 2)
