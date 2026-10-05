@@ -1,5 +1,4 @@
 from random import Random
-from .config import Config, load_config_model
 from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
@@ -14,7 +13,7 @@ class MazeGenerator:
     Class that will generate the maze.
 
     Attributes:
-        config (Config): It stores all the info gathered from the config file.
+
         grid (list[list[Cell]]): Represents a 2D list of Cells.
         entry (Cell): Indicates which cell is the entrance of the maze.
         exit (Cell): Indicates which cell is the exit of the maze.
@@ -22,40 +21,56 @@ class MazeGenerator:
                             '42' pattern inside.
         seed (int): An integer to reproduce an specific maze.
     """
-    config: Config
-    grid: list[list[Cell]]
     entry: Cell
     exit: Cell
+    grid: list[list[Cell]]
     has_pattern: bool = False
-    seed: int
 
-    def __init__(self, use_seed: bool) -> None:
+    def __init__(
+            self, width: int, height: int,
+            entry: tuple[int, int], exit: tuple[int, int],
+            output_file: str,
+            use_seed: bool,
+            perfect: bool = False,
+            seed: int | None = None,
+            algorithm: str = "ab",
+    ) -> None:
         """
         Initialize the maze.
 
         We do the config file parsing here.
         """
+
+        self.width = width
+        self.height = height
+        self.entry_pos = entry
+        self.exit_pos = exit
+        self.output_file = output_file
+        self.perfect = perfect
+        self.seed = seed
+        self.algorithm = algorithm
         self.use_seed = use_seed
-        self.config = load_config_model()
-        self.grid = generate_grid(self.config)
-        if self.config.width >= 8 and self.config.height >= 6:
+
+        self.grid = self.generate_grid()
+
+        if self.width >= 8 and self.height >= 6:
             self.has_pattern = True
         if self.has_pattern:
             pattern_pos = pattern_positions(calculate_center(self.grid))
             define_pattern(self.grid)
             msgs: list[str] = list()
 
-            if self.config.entry in pattern_pos:
-                entry: str = "ENTRY " + str(self.config.entry)
-                msgs.append(entry + " cannot be inside of the pattern")
-            if self.config.exit in pattern_pos:
-                exit: str = "EXIT " + str(self.config.exit)
-                msgs.append(exit + " cannot be inside of the pattern")
+            if self.entry_pos in pattern_pos:
+                entry_msg = "ENTRY " + str(self.entry)
+                msgs.append(entry_msg + " cannot be inside of the pattern")
+            if self.exit_pos in pattern_pos:
+                exit_msg = "EXIT " + str(self.exit)
+                msgs.append(exit_msg + " cannot be inside of the pattern")
             if len(msgs) > 0:
                 raise InvalidConfigError(msgs)
 
-        entry_x, entry_y = self.config.entry
-        exit_x, exit_y = self.config.exit
+        entry_x, entry_y = self.entry_pos
+        exit_x, exit_y = self.exit_pos
 
         self.entry = self.grid[entry_y][entry_x]
         self.exit = self.grid[exit_y][exit_x]
@@ -64,49 +79,54 @@ class MazeGenerator:
         self.generate()
 
     def generate(self) -> None:
-        if self.config.seed is not None and self.use_seed:
-            rnd = Random(self.config.seed)
+        if self.seed is not None and self.use_seed:
+            rnd = Random(self.seed)
         else:
             rnd = Random()
 
-        if self.config.algorithm == "ab":
+        if self.algorithm == "ab":
             self.grid = genmaze_ab(self.grid, self.entry, rnd)
         else:
             self.grid = genmaze_dfs(self.grid, self.entry, rnd)
         self.solution = solve_maze_bfs(self.grid, self.entry, self.exit)
 
         active_solution_path(self.solution)
-        export_maze(self.grid, self.config, self.solution)
+        export_maze(self.grid, self.entry, self.exit,
+                    self.output_file, self.solution)
+
+    def generate_grid(self) -> list[list[Cell]]:
+        """
+        Generate the grid of cells that will be used to create the maze.
+
+        Args:
+            config (Config): The configuration model that contains the
+                information about the maze.
+
+        Returns:
+            A 2D list of Cell objects that represents the grid of cells.
+        """
+        grid: list[list[Cell]] = []
+        for y in range(self.height):
+            row: list[Cell] = []
+            for x in range(self.width):
+                if x == self.entry_pos[0] and y == self.entry_pos[1]:
+                    cell = Cell((x, y), 15, False, False, True, False)
+                elif x == self.exit_pos[0] and y == self.exit_pos[1]:
+                    cell = Cell((x, y), 15, False, False, False, True)
+                else:
+                    cell = Cell((x, y), 15, False, False, False, False)
+                row.append(cell)
+            grid.append(row)
+        return grid
 
 
-def generate_grid(config: Config) -> list[list[Cell]]:
-    """
-    Generate the grid of cells that will be used to create the maze.
-
-    Args:
-        config (Config): The configuration model that contains the
-            information about the maze.
-
-    Returns:
-        A 2D list of Cell objects that represents the grid of cells.
-    """
-    grid: list[list[Cell]] = []
-    for y in range(config.height):
-        row: list[Cell] = []
-        for x in range(config.width):
-            if x == config.entry[0] and y == config.entry[1]:
-                cell = Cell((x, y), 15, False, False, True, False)
-            elif x == config.exit[0] and y == config.exit[1]:
-                cell = Cell((x, y), 15, False, False, False, True)
-            else:
-                cell = Cell((x, y), 15, False, False, False, False)
-            row.append(cell)
-        grid.append(row)
-    return grid
-
-def valid_wall_removal(grid: list[list[Cell]], target_cell: Cell,  direction: DIRECTION):
-
+def valid_wall_removal(
+        grid: list[list[Cell]],
+        target_cell: Cell,
+        direction: DIRECTION
+) -> None:
     check_open_areas(grid)
+
 
 def check_open_areas(grid: list[list[Cell]]) -> bool:
     for row in grid:
@@ -116,12 +136,13 @@ def check_open_areas(grid: list[list[Cell]]) -> bool:
                     return True
     return False
 
+
 def check_open_neighbours(grid: list[list[Cell]], cell: Cell) -> list[Cell]:
     x, y = cell.position
     all: list[Cell] = []
     if y > 0 and not grid[y - 1][x].walls == 1:
         all.append(grid[y - 1][x])
-    if x < len(grid[0]) - 1 and not grid[y][x + 1].walls == 2 :
+    if x < len(grid[0]) - 1 and not grid[y][x + 1].walls == 2:
         all.append(grid[y][x + 1])
     if y < len(grid) - 1 and not grid[y + 1][x].walls == 4:
         all.append(grid[y + 1][x])

@@ -1,6 +1,7 @@
 from .mazegen import MazeGenerator, Cell
 from .enums import COLOR
 from .themes import THEMES
+from .config import Config
 from mlx import Mlx
 from typing import Any
 
@@ -58,15 +59,16 @@ class View:
                maze.
     """
 
-    def __init__(self, mazegen: MazeGenerator) -> None:
+    def __init__(self, mazegen: MazeGenerator, config: Config) -> None:
         """
         Initialize the view with the attributes defined previously.
         """
-        self.window_width = (mazegen.config.width * self.cell_size
-                             + self.horizontal_margin)
-        self.window_height = (mazegen.config.height * self.cell_size
-                              + self.vertical_margin)
+        self.config = config
         self.mazegen = mazegen
+        self.window_width = (mazegen.width * self.cell_size
+                             + self.horizontal_margin)
+        self.window_height = (mazegen.height * self.cell_size
+                              + self.vertical_margin)
 
     def key_handler(self, keycode: int) -> None:
         """
@@ -103,7 +105,12 @@ class View:
         Creates new maze generator and random objects and calls the algorithm,
         the export function and the function that draws and shows the maze
         """
-        self.mazegen = MazeGenerator(False)
+        cfg = self.config
+        self.mazegen = MazeGenerator(
+            cfg.width, cfg.height, cfg.entry, cfg.exit,
+            cfg.output_file, False, cfg.perfect, cfg.seed,
+            cfg.algorithm
+        )
         self.draw_and_show()
 
     def generate_view(self) -> None:

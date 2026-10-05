@@ -4,7 +4,7 @@ from pydantic import (BaseModel,
                       Field,
                       model_validator)
 from typing import Annotated, Any
-from .errors import InvalidConfigError, ParamsError
+from .mazegen.errors import InvalidConfigError, ParamsError
 
 
 class Config(BaseModel):
@@ -30,7 +30,7 @@ class Config(BaseModel):
                 Annotated[int, Field(ge=0, le=14)]]
     output_file: str = Field(default="output_maze.txt", max_length=25)
     perfect: bool = False
-    seed: float | None = Field(default=None, ge=1.0)
+    seed: int | None = Field(default=None, ge=1)
     algorithm: str = Field(default="ab", max_length=10)
 
     @model_validator(mode='after')

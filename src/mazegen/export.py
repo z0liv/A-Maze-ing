@@ -1,17 +1,20 @@
-from .config import Config
 from .cell import Cell
 
 
 def export_maze(
-        grid: list[list[Cell]], config: Config, solution: list[Cell]
+        grid: list[list[Cell]], entry: Cell,
+        exit: Cell, output_file: str, solution: list[Cell]
 ) -> None:
     """
     Function that writes the maze information into the
     output file given by the mazegen.config.
     """
     try:
-        with open(config.output_file, "w") as file:
-            content = list_content(grid, config, solution)
+        with open(output_file, "w") as file:
+            content = list_content(
+                grid, entry.position,
+                exit.position, solution
+            )
             for element in content:
                 file.write(element)
     except PermissionError as e:
@@ -50,7 +53,8 @@ def get_solution_directions(solution: list[Cell]) -> str:
 
 
 def list_content(
-        grid: list[list[Cell]], config: Config, solution: list[Cell]
+        grid: list[list[Cell]], entry: tuple[int, int],
+        exit: tuple[int, int], solution: list[Cell]
 ) -> list[str]:
     """
     Format the maze information into the correct output format
@@ -77,9 +81,9 @@ def list_content(
         content.append("\n")
 
     content.append("\n")
-    content.append(f"{config.entry[0]},{config.entry[1]}")
+    content.append(f"{entry[0]},{entry[1]}")
     content.append("\n")
-    content.append(f"{config.exit[0]},{config.exit[1]}")
+    content.append(f"{exit[0]},{exit[1]}")
     content.append("\n")
     content.append(get_solution_directions(solution))
 
