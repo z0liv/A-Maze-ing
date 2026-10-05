@@ -19,6 +19,17 @@ def export_maze(
 
 
 def get_solution_directions(solution: list[Cell]) -> str:
+    """
+    Loops inside the solution list verifiying each Cell
+    with the next one to store the direction in the result
+    string.
+
+    Parameters:
+        solution (list[Cell]): A list of the cells that are part of the
+                               solution.
+    Returns:
+        A stirng with the directions of the solution.
+    """
     result: str = ""
     current = solution[0]
     for next in solution[1:]:
