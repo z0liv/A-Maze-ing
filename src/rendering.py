@@ -3,8 +3,6 @@ from .mazegen.enums import COLOR
 from .mazegen.themes import THEMES
 from mlx import Mlx
 from typing import Any
-import random
-import os
 
 
 class View:
@@ -105,7 +103,7 @@ class View:
         Creates new maze generator and random objects and calls the algorithm,
         the export function and the function that draws and shows the maze
         """
-        self.mazegen = MazeGenerator(random.Random())
+        self.mazegen = MazeGenerator(False)
         export_maze(self.mazegen.grid,
                     self.mazegen.config,
                     self.mazegen.solution)
@@ -344,4 +342,3 @@ class View:
         self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
         self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
         self.mlx.mlx_loop(self.ptr[0])
-        os._exit(0)
