@@ -61,10 +61,10 @@ class MazeGenerator:
             msgs: list[str] = list()
 
             if self.entry_pos in pattern_pos:
-                entry_msg = "ENTRY " + str(self.entry)
+                entry_msg = "ENTRY " + str(self.entry_pos)
                 msgs.append(entry_msg + " cannot be inside of the pattern")
             if self.exit_pos in pattern_pos:
-                exit_msg = "EXIT " + str(self.exit)
+                exit_msg = "EXIT " + str(self.exit_pos)
                 msgs.append(exit_msg + " cannot be inside of the pattern")
             if len(msgs) > 0:
                 raise InvalidConfigError(msgs)

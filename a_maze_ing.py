@@ -7,9 +7,12 @@ from src.config import load_config_model
 def main() -> None:
     try:
         cfg = load_config_model()
+        use_seed = False
+        if cfg.seed != None:
+            use_seed = True
         mazegen: MazeGenerator = MazeGenerator(
             cfg.width, cfg.height, cfg.entry, cfg.exit,
-            cfg.output_file, False, cfg.perfect, cfg.seed,
+            cfg.output_file, use_seed, cfg.perfect, cfg.seed,
             cfg.algorithm
         )
         view = View(mazegen, cfg)
