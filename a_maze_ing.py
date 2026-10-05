@@ -8,7 +8,7 @@ def main() -> None:
     try:
         cfg = load_config_model()
         use_seed = False
-        if cfg.seed != None:
+        if cfg.seed is not None:
             use_seed = True
         mazegen: MazeGenerator = MazeGenerator(
             cfg.width, cfg.height, cfg.entry, cfg.exit,
