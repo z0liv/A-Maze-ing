@@ -98,7 +98,7 @@ class View:
             self.draw_and_show()
         elif keycode == 53 or keycode == 65437:
             print("Exit")
-            self.mlx.mlx_loop_exit(self.ptr[0])
+            self.clean_shutdown()
 
     def redo_maze(self) -> None:
         """
@@ -115,6 +115,9 @@ class View:
         """
         self.initialize_image()
         self.draw_and_show()
+
+    def clean_shutdown(self) -> None:
+        self.mlx.mlx_loop_exit(self.ptr[0])
 
     def draw_and_show(self) -> None:
         """
@@ -336,9 +339,9 @@ class View:
             self.key_handler(keynum)
 
         def on_destroy(_: Any) -> None:
-            self.mlx.mlx_loop_exit(self.ptr[0])
+            self.clean_shutdown()
         stuff = [1, 2]
         self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
         self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
         self.mlx.mlx_loop(self.ptr[0])
-        os._exit(0)
+        self.clean_shutdown()
