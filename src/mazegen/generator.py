@@ -6,6 +6,7 @@ from .algorithms import (
     solve_maze_bfs, active_solution_path)
 from .cell import Cell
 from .export import export_maze
+from .enums import DIRECTION
 
 
 class MazeGenerator:
@@ -98,6 +99,31 @@ def generate_grid(config: Config) -> list[list[Cell]]:
             row.append(cell)
         grid.append(row)
     return grid
+
+def valid_wall_removal(grid: list[list[Cell]], target_cell: Cell,  direction: DIRECTION):
+
+    check_open_areas(grid)
+
+def check_open_areas(grid: list[list[Cell]]) -> bool:
+    for row in grid:
+        for cell in row:
+            if (cell.walls == 0):
+                if len(check_open_neighbours(grid, cell)) == 8:
+                    return True
+    return False
+
+def check_open_neighbours(grid: list[list[Cell]], cell: Cell) -> list[Cell]:
+    x, y = cell.position
+    all: list[Cell] = []
+    if y > 0 and not grid[y - 1][x].walls == 1:
+        all.append(grid[y - 1][x])
+    if x < len(grid[0]) - 1 and not grid[y][x + 1].walls == 2 :
+        all.append(grid[y][x + 1])
+    if y < len(grid) - 1 and not grid[y + 1][x].walls == 4:
+        all.append(grid[y + 1][x])
+    if x > 0 and not grid[y][x - 1].walls == 8:
+        all.append(grid[y][x - 1])
+    return all
 
 
 def define_pattern(grid: list[list[Cell]]) -> None:
