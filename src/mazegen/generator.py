@@ -1,6 +1,6 @@
 from random import Random
-from ..config import Config, load_config_model
-from ..errors import InvalidConfigError
+from .config import Config, load_config_model
+from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
     solve_maze_bfs, active_solution_path)

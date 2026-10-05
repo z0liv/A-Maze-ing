@@ -1,6 +1,6 @@
 from .mazegen import MazeGenerator, Cell, export_maze
-from .enums import COLOR
-from .themes import THEMES
+from .mazegen.enums import COLOR
+from .mazegen.themes import THEMES
 from mlx import Mlx
 from typing import Any
 import random

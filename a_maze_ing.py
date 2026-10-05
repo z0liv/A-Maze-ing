@@ -1,5 +1,5 @@
-from src import MazeGenerator
-from src.errors import ParamsError, InvalidConfigError
+from src.mazegen import MazeGenerator
+from src.mazegen.errors import ParamsError, InvalidConfigError
 from src.rendering import View
 
 
