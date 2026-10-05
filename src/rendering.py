@@ -308,13 +308,24 @@ class View:
         """
         Function that writes the user interaction texts into the window.
         """
-        options: list[str] = [
-            "1. Re-generate a new maze",
-            "2. Show / Hide the shortest path",
-            "3. Rotate the wall colours",
-            "4. Switch theme",
-            "5. Exit",
-        ]
+        options: list[str]
+        if len(self.mazegen.grid[0]) > 6:
+            options = [
+                "1. Re-generate a new maze",
+                "2. Show / Hide the shortest path",
+                "3. Rotate the wall colours",
+                "4. Switch theme",
+                "5. Exit",
+            ]
+        else:
+            options = [
+                "1. Regen",
+                "2. Path",
+                "3. Color",
+                "4. Theme",
+                "5. Exit",
+            ]
+
         i = 5
         for opt in options:
             self.mlx.mlx_string_put(self.ptr[0],

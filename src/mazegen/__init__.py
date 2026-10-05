@@ -1,3 +1,9 @@
+"""
+Expose the classes MazeGenerator, Cell. The Enum DIRECTION.
+The algorithm functions and the export maze function.
+"""
+
+
 from .cell import Cell
 from .enums import DIRECTION
 from .generator import MazeGenerator

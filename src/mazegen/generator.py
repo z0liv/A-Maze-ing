@@ -15,8 +15,12 @@ class MazeGenerator:
 
     Attributes:
         config (Config): It stores all the info gathered from the config file.
-        entry: (Cell): Indicates which cell is the entrance of the maze.
-        exit: (Cell): Indicates which cell is the exit of the maze.
+        grid (list[list[Cell]]): Represents a 2D list of Cells.
+        entry (Cell): Indicates which cell is the entrance of the maze.
+        exit (Cell): Indicates which cell is the exit of the maze.
+        has_pattern (bool): Indicates if the grid is big enough to have a
+                            '42' pattern inside.
+        seed (int): An integer to reproduce an specific maze.
     """
     config: Config
     grid: list[list[Cell]]
