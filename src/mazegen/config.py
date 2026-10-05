@@ -9,19 +9,19 @@ from .errors import InvalidConfigError, ParamsError
 
 class Config(BaseModel):
     """
-        Configuration model for the maze generator.
+    Configuration model for the maze generator.
 
-        Inherits from BaseModel to provide data validation through Pydantic.
+    Inherits from BaseModel to provide data validation through Pydantic.
 
-        Attributes:
-            width (int): Width of the maze.
-            height (int): Height of the maze.
-            entry (tuple[int, int]): Coordinates of the entry point.
-            exit (tuple[int, int]): Coordinates of the exit point.
-            output_file (str): Name of the output file for the generated maze.
-            perfect (bool): Whether to generate a perfect or imperfect maze.
-            seed (int): Seed used to generate a specific maze.
-"""
+    Attributes:
+        width (int): Width of the maze.
+        height (int): Height of the maze.
+        entry (tuple[int, int]): Coordinates of the entry point.
+        exit (tuple[int, int]): Coordinates of the exit point.
+        output_file (str): Name of the output file for the generated maze.
+        perfect (bool): Whether to generate a perfect or imperfect maze.
+        seed (int): Seed used to generate a specific maze.
+    """
     width: int = Field(gt=0, le=35)
     height: int = Field(gt=0, le=20)
     entry: tuple[Annotated[int, Field(ge=0, le=35)],
@@ -30,7 +30,7 @@ class Config(BaseModel):
                 Annotated[int, Field(ge=0, le=20)]]
     output_file: str = Field(default="output_maze.txt", max_length=25)
     perfect: bool = False
-    seed: int = Field(default=42, ge=0)
+    seed: float | None = Field(default=None, ge=1.0)
     algorithm: str = Field(default="ab", max_length=10)
 
     @model_validator(mode='after')
@@ -47,7 +47,7 @@ class Config(BaseModel):
             self.algorithm = "ab"
             print("There are only 2 available algos",
                   "ab and dfs",
-                  ", using default 'maze.txt'.")
+                  ", using default 'ab'.")
         if (self.entry[0] >= self.width or self.entry[0] < 0):
             raise ValueError("Entry out of bounds.")
         if (self.entry[1] >= self.height or self.entry[1] < 0):
@@ -63,13 +63,13 @@ class Config(BaseModel):
 
 def validate_params() -> str:
     """
-        Validate that there is the correct number of params.
+    Validate that there is the correct number of params.
 
-        Returns:
-            The filename extracted from the sys.argv.
-        Raises:
-            ParamsError: If the number of params is equal to 1 or
-                is greater than 2.
+    Returns:
+        The filename extracted from the sys.argv.
+    Raises:
+        ParamsError: If the number of params is equal to 1 or
+            is greater than 2.
     """
     try:
         args = sys.argv
@@ -88,12 +88,12 @@ def validate_params() -> str:
 
 def load_config_model() -> Config:
     """
-        Reads the configuration file and loads its values
-        into the Config model.
+    Reads the configuration file and loads its values
+    into the Config model.
 
-        Raises:
-            ValueError: If the syntax of the config file is not "key=value".
-            InvalidConfigError: If the configuration fails model validation.
+    Raises:
+        ValueError: If the syntax of the config file is not "key=value".
+        InvalidConfigError: If the configuration fails model validation.
     """
     try:
         filename = validate_params()

@@ -24,12 +24,13 @@ class MazeGenerator:
     has_pattern: bool = False
     seed: int
 
-    def __init__(self, rnd: Random | None) -> None:
+    def __init__(self, use_seed: bool) -> None:
         """
         Initialize the maze.
 
         We do the config file parsing here.
         """
+        self.use_seed = use_seed
         self.config = load_config_model()
         self.grid = generate_grid(self.config)
         if self.config.width >= 8 and self.config.height >= 6:
@@ -55,12 +56,13 @@ class MazeGenerator:
         self.exit = self.grid[exit_y][exit_x]
 
         self.entry.visited = True
+        self.generate()
 
-        self.generate(rnd)
-
-    def generate(self, rnd: Random | None = None) -> None:
-        if not rnd:
+    def generate(self) -> None:
+        if self.config.seed is not None and self.use_seed:
             rnd = Random(self.config.seed)
+        else:
+            rnd = Random()
 
         if self.config.algorithm == "ab":
             self.grid = genmaze_ab(self.grid, self.entry, rnd)

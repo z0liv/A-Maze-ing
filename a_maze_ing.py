@@ -5,7 +5,7 @@ from src.rendering import View
 
 def main() -> None:
     try:
-        mazegen: MazeGenerator = MazeGenerator(None)
+        mazegen: MazeGenerator = MazeGenerator(True)
         view = View(mazegen)
         view.generate_view()
     except Exception as error:
