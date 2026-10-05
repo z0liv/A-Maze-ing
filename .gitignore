@@ -3,3 +3,5 @@ __pycache__/
 *.py[cod]
 .mypy_cache/
 .pytest_cache/
+maze.txt
+output_maze.txt
