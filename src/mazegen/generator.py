@@ -24,7 +24,7 @@ class MazeGenerator:
     has_pattern: bool = False
     seed: int
 
-    def __init__(self) -> None:
+    def __init__(self, rnd: Random | None) -> None:
         """
         Initialize the maze.
 
@@ -56,10 +56,11 @@ class MazeGenerator:
 
         self.entry.visited = True
 
-        self.generate()
+        self.generate(rnd)
 
-    def generate(self) -> None:
-        rnd = Random(self.config.seed)
+    def generate(self, rnd: Random | None = None) -> None:
+        if not rnd:
+            rnd = Random(self.config.seed)
 
         if self.config.algorithm == "ab":
             self.grid = genmaze_ab(self.grid, self.entry, rnd)

@@ -1,4 +1,4 @@
-from .mazegen import MazeGenerator, Cell, genmaze_ab, genmaze_dfs, export_maze
+from .mazegen import MazeGenerator, Cell, export_maze
 from .enums import COLOR
 from .themes import THEMES
 from mlx import Mlx
@@ -105,12 +105,7 @@ class View:
         Creates new maze generator and random objects and calls the algorithm,
         the export function and the function that draws and shows the maze
         """
-        self.mazegen = MazeGenerator()
-        rnd = random.Random()
-        if self.mazegen.config.algorithm == "ab":
-            self.grid = genmaze_ab(self.mazegen.grid, self.mazegen.entry, rnd)
-        else:
-            self.grid = genmaze_dfs(self.mazegen.grid, self.mazegen.entry, rnd)
+        self.mazegen = MazeGenerator(random.Random())
         export_maze(self.mazegen.grid,
                     self.mazegen.config,
                     self.mazegen.solution)
@@ -162,17 +157,30 @@ class View:
         if (cell.is_pattern):
             self.draw_pixel(row, cell, i, j, self.theme[1]["pattern"])
         elif (cell.is_entry):
-            if (i > self.wall_size and i < self.cell_size - self.wall_size
-                    and j > self.wall_size and j < self.cell_size - self.wall_size):
+            if (
+                i > self.wall_size
+                and i < self.cell_size - self.wall_size
+                and j > self.wall_size
+                and j < self.cell_size - self.wall_size
+               ):
                 self.draw_pixel(row, cell, i, j, self.theme[1]["entry"])
         elif (cell.is_exit):
-            if (i > self.wall_size and i < self.cell_size - self.wall_size
-                    and j > self.wall_size and j < self.cell_size - self.wall_size):
+            if (
+                i > self.wall_size
+                and i < self.cell_size - self.wall_size
+                and j > self.wall_size
+                and j < self.cell_size - self.wall_size
+               ):
                 self.draw_pixel(row, cell, i, j, self.theme[1]["exit"])
         if (self.show_solution and cell.in_solution):
-            if (i >= self.cell_size // 3 and i < (self.cell_size // 3) * 2
-                    and j >= self.cell_size // 3 and j < (self.cell_size // 3) * 2):
-                self.draw_pixel(row, cell, i, j, self.theme[1]["solution"])
+            if not cell.is_entry and not cell.is_exit:
+                if (
+                    i >= self.cell_size // 3
+                    and i < (self.cell_size // 3) * 2
+                    and j >= self.cell_size // 3
+                    and j < (self.cell_size // 3) * 2
+                   ):
+                    self.draw_pixel(row, cell, i, j, self.theme[1]["solution"])
 
         # define maze borders
         top: bool = (self.mazegen.grid.index(row) == 0 and i <= wall_size * 2)
