@@ -1,4 +1,4 @@
-from .mazegen import MazeGenerator, Cell, export_maze
+from .mazegen import MazeGenerator, Cell
 from .mazegen.enums import COLOR
 from .mazegen.themes import THEMES
 from mlx import Mlx
@@ -104,9 +104,6 @@ class View:
         the export function and the function that draws and shows the maze
         """
         self.mazegen = MazeGenerator(False)
-        export_maze(self.mazegen.grid,
-                    self.mazegen.config,
-                    self.mazegen.solution)
         self.draw_and_show()
 
     def generate_view(self) -> None:
