@@ -12,7 +12,7 @@ def solve_maze_bfs(
         grid (list[list[Cell]]): Represents a 2D list of Cells.
         entry: Entry Cell of the maze.
         entry: Exit Cell of the maze.
-    
+
     Returns:
         A list of Cells that represents the solution path of the maze.
     """

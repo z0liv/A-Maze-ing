@@ -78,7 +78,7 @@ def list_content(
 
     Returns:
         A list of each cell.walls transformed into hexadecimal, the
-        entry and exit positions and the solution path in a string 
+        entry and exit positions and the solution path in a string
         represented by the cardinal directions 'NESW'.
         formatted into the expected output format to use it in the
         'maze_analizer.py'
