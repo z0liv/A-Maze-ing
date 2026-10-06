@@ -147,6 +147,7 @@ class MazeGenerator:
             neighbour: Cell = self.grid[target_cell.position[1] + dy][target_cell.position[0] + dx]
             neighbour.walls &= ~opposite(direction).value
 
+
 def check_full_conectivity(
         grid: list[list[Cell]],
         entry: Cell,

@@ -5,6 +5,7 @@ from .config import Config
 from mlx import Mlx
 from typing import Any
 
+
 class View:
 
     """
@@ -143,6 +144,7 @@ class View:
             self.cell_size - 2 * margin,
             self.theme[1]["solution"]
         )
+
     def animation_loop(self, _: Any) -> None:
         if not self.animating:
             return
@@ -191,14 +193,15 @@ class View:
         """
         Fill the maze area with the background color.
         """
+        width = self.mazegen.width * self.cell_size
+        height = self.mazegen.height * self.cell_size
         color = bytes(self.theme[1]["background"].value)
 
-        row = color * self.window_width
+        for y in range(height):
+            for x in range(width):
+                start = self.offset(x, y)
+                self.image_data[start:start + 4] = color
 
-        for y in range(self.window_height):
-            start = self.offset(0, y)
-            self.image_data[start:start + self.window_width * 4] = row
-    
     def draw_cell_content(self, x: int, y: int, cell: Cell) -> None:
         margin = self.wall_size
 
@@ -274,7 +277,10 @@ class View:
                 color
             )
 
-    def draw_rectangle(self, x: int, y: int, width: int, height: int, color: COLOR) -> None:
+    def draw_rectangle(
+            self, x: int, y: int,
+            width: int, height: int, color: COLOR
+    ) -> None:
         for py in range(y, y + height):
             start = self.offset(x, py)
             end = start + width * 4
@@ -305,8 +311,6 @@ class View:
         start = self.offset(px, py)
         self.image_data[start:start + 4] = bytes(color.value)
 
-    
-
     def initialize_image(self) -> None:
         """
         Initializes the graphics, the window and the image with its data.
@@ -319,9 +323,14 @@ class View:
             self.window_height,
             "A-Maze-ing")
         self.mlx.mlx_clear_window(mlx_ptr, win_ptr)
-        img_ptr = self.mlx.mlx_new_image(mlx_ptr, 2000, 2000)
+
+        maze_width = self.mazegen.width * self.cell_size
+        maze_height = self.mazegen.height * self.cell_size
+
+        img_ptr = self.mlx.mlx_new_image(mlx_ptr, maze_width, maze_height)
         self.image_data, _, self.size_line, _ = self.mlx.mlx_get_data_addr(
             img_ptr)
+
         self.ptr = (mlx_ptr, win_ptr, img_ptr)
 
     def write_options(self) -> None:
@@ -384,9 +393,9 @@ class View:
         """
         Set the image in the window and add the key handler to it.
         """
+        margin = self.horizontal_margin // 2
         self.mlx.mlx_put_image_to_window(self.ptr[0], self.ptr[1], self.ptr[2],
-                                         int(self.horizontal_margin / 2),
-                                         int(self.horizontal_margin / 2))
+                                         margin, margin)
 
         """ def on_key(keynum: int, _: Any) -> None:
             self.key_handler(keynum)
