@@ -1,8 +1,10 @@
+from collections import deque
 from random import Random
 from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
-    solve_maze_bfs, active_solution_path)
+    solve_maze_bfs, active_solution_path,
+    get_connected_neighbours)
 from .cell import Cell
 from .export import export_maze
 from .enums import DIRECTION
@@ -119,36 +121,79 @@ class MazeGenerator:
             grid.append(row)
         return grid
 
+    def valid_wall_removal(
+            self,
+            target_cell: Cell,
+            direction: DIRECTION
+    ) -> None:
+        check_open_areas(self.grid)
+        check_full_conectivity(self.grid, self.entry, self.has_pattern,
+                               self.height, self.width)
 
-def valid_wall_removal(
+
+def check_full_conectivity(
         grid: list[list[Cell]],
-        target_cell: Cell,
-        direction: DIRECTION
-) -> None:
-    check_open_areas(grid)
+        entry: Cell,
+        pattern: bool,
+        height: int,
+        width: int
+) -> bool:
+    seen: set[Cell] = {entry}
+    queue: deque[Cell] = deque([entry])
+    while queue:
+        current: Cell = queue.popleft()
+        connected: list[Cell] = [x[0] for x in
+                                 get_connected_neighbours(current, grid)]
+        for next in connected:
+            if next not in seen:
+                seen.add(next)
+                queue.append(next)
+    if (pattern and len(seen) == height * width - 18):
+        return True
+    elif (not pattern and len(seen) == height * width):
+        return True
+    else:
+        return False
 
 
 def check_open_areas(grid: list[list[Cell]]) -> bool:
     for row in grid:
         for cell in row:
             if (cell.walls == 0):
-                if len(check_open_neighbours(grid, cell)) == 8:
+                if check_open_neighbours(grid, cell) == 8:
                     return True
     return False
 
 
-def check_open_neighbours(grid: list[list[Cell]], cell: Cell) -> list[Cell]:
+def check_open_neighbours(grid: list[list[Cell]], cell: Cell) -> int:
     x, y = cell.position
-    all: list[Cell] = []
-    if y > 0 and not grid[y - 1][x].walls == 1:
-        all.append(grid[y - 1][x])
-    if x < len(grid[0]) - 1 and not grid[y][x + 1].walls == 2:
-        all.append(grid[y][x + 1])
-    if y < len(grid) - 1 and not grid[y + 1][x].walls == 4:
-        all.append(grid[y + 1][x])
-    if x > 0 and not grid[y][x - 1].walls == 8:
-        all.append(grid[y][x - 1])
-    return all
+    count: int = 0
+    # North
+    if y > 0 and grid[y - 1][x].walls == 1:
+        count += 1
+    # East
+    if x < len(grid[0]) - 1 and grid[y][x + 1].walls == 2:
+        count += 1
+    # South
+    if y < len(grid) - 1 and grid[y + 1][x].walls == 4:
+        count += 1
+    # West
+    if x > 0 and grid[y][x - 1].walls == 8:
+        count += 1
+    # North-West
+    if x > 0 and y > 0 and grid[y - 1][x - 1].walls == 9:
+        count += 1
+    # North-East
+    if x < len(grid[0]) - 1 and y > 0 - 1 and grid[y - 1][x + 1].walls == 3:
+        count += 1
+    # South-West
+    if x > 0 and y < len(grid) - 1 and grid[y + 1][x - 1].walls == 12:
+        count += 1
+    # South-East
+    if (x < len(grid[0]) - 1 and y < len(grid) - 1
+            and grid[y + 1][x + 1].walls == 10):
+        count += 1
+    return count
 
 
 def define_pattern(grid: list[list[Cell]]) -> None:

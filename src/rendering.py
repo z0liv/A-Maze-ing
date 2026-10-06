@@ -181,14 +181,7 @@ class View:
                 self.draw_pixel(x, y, cell, i, j, self.theme[1]["exit"])
         if (self.show_solution and cell.in_solution):
             if not cell.is_entry and not cell.is_exit:
-                if (
-                    i >= self.cell_size // 3
-                    and i < (self.cell_size // 3) * 2
-                    and j >= self.cell_size // 3
-                    and j < (self.cell_size // 3) * 2
-                   ):
-                    self.draw_pixel(x, y,
-                                    cell, i, j, self.theme[1]["solution"])
+                self.draw_pixel(x, y, cell, i, j, self.theme[1]["solution"])
 
         # define maze borders
         top: bool = (y == 0 and i <= wall_size * 2)
