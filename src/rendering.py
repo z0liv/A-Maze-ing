@@ -120,10 +120,44 @@ class View:
         and draws the maze along with the user interaction options.
         """
         self.initialize_image()
-        self.draw_and_show()
+        self.draw_complete_grid()
+        self.write_options()
+        self.show_image()
+        self.setup_hooks()
+        self.mlx.mlx_loop(self.ptr[0])
 
     def clean_shutdown(self) -> None:
         self.mlx.mlx_loop_exit(self.ptr[0])
+
+    def draw_solution_step(self, cell: Cell) -> None:
+        """Draw one solution cell."""
+
+        x, y = cell.position
+
+        margin = self.cell_size // 3
+
+        self.draw_rectangle(
+            x * self.cell_size + margin,
+            y * self.cell_size + margin,
+            self.cell_size - 2 * margin,
+            self.cell_size - 2 * margin,
+            self.theme[1]["solution"]
+        )
+    def animation_loop(self, _: Any) -> None:
+        if not self.animating:
+            return
+
+        if self.animation_index >= len(self.mazegen.solution):
+            self.animating = False
+            return
+
+        cell = self.mazegen.solution[self.animation_index]
+
+        self.draw_solution_step(cell)
+
+        self.animation_index += 1
+
+        self.show_image()
 
     def draw_and_show(self) -> None:
         """
@@ -140,88 +174,112 @@ class View:
         For each pixel in each cell, calls a function that decides if the pixel
         needs to be drawn.
         """
+        self.set_background()
+
         for y, row in enumerate(self.mazegen.grid):
             for x, cell in enumerate(row):
-                for i in range(self.cell_size):
-                    for j in range(self.cell_size):
-                        self.draw_all_pixels(x, y, row, cell, i, j)
+                self.draw_cell(x, y, cell)
 
-    def draw_all_pixels(
+    def draw_cell(self, x: int, y: int, cell: Cell) -> None:
+        """
+        Function to draw independent Cells.
+        """
+        self.draw_cell_content(x, y, cell)
+        self.draw_cell_walls(x, y, cell)
+
+    def set_background(self) -> None:
+        """
+        Fill the maze area with the background color.
+        """
+        color = bytes(self.theme[1]["background"].value)
+
+        row = color * self.window_width
+
+        for y in range(self.window_height):
+            start = self.offset(0, y)
+            self.image_data[start:start + self.window_width * 4] = row
+    
+    def draw_cell_content(self, x: int, y: int, cell: Cell) -> None:
+        margin = self.wall_size
+
+        px = x * self.cell_size + margin
+        py = y * self.cell_size + margin
+
+        size = self.cell_size - 2 * margin
+
+        if cell.is_pattern:
+            color = self.theme[1]["pattern"]
+        elif cell.is_entry:
+            color = self.theme[1]["entry"]
+        elif cell.is_exit:
+            color = self.theme[1]["exit"]
+        elif self.show_solution and cell.in_solution:
+            color = self.theme[1]["solution"]
+        else:
+            return
+
+        self.draw_rectangle(
+            px,
+            py,
+            size,
+            size,
+            color
+        )
+
+    def draw_cell_walls(
         self,
         x: int,
         y: int,
-        row: list[Cell],
-        cell: Cell,
-        i: int,
-        j: int,
+        cell: Cell
     ) -> None:
-        """
-        First draws every pixel with the background color,
-        then draws the cells that belong to the pattern with the proper color,
-        then draws the walls with the specified color in the theme.
-        """
-        wall_size = self.wall_size
-        self.draw_pixel(x, y, i, j, self.theme[1]["background"])
-        if (cell.is_pattern):
-            self.draw_pixel(x, y, i, j, self.theme[1]["pattern"])
-        elif (cell.is_entry):
-            if (
-                i > self.wall_size
-                and i < self.cell_size - self.wall_size
-                and j > self.wall_size
-                and j < self.cell_size - self.wall_size
-               ):
-                self.draw_pixel(x, y, i, j, self.theme[1]["entry"])
-        elif (cell.is_exit):
-            if (
-                i > self.wall_size
-                and i < self.cell_size - self.wall_size
-                and j > self.wall_size
-                and j < self.cell_size - self.wall_size
-               ):
-                self.draw_pixel(x, y, i, j, self.theme[1]["exit"])
-        if (self.show_solution and cell.in_solution):
-            if not cell.is_entry and not cell.is_exit:
-                self.draw_pixel(x, y, i, j, self.theme[1]["solution"])
 
-        # define maze borders
-        top: bool = (y == 0 and i <= wall_size * 2)
-        bottom: bool = (
-            y == len(self.mazegen.grid) - 1
-            and i >= self.cell_size - wall_size * 2
-        )
-        left: bool = (x == 0 and j <= wall_size * 2)
-        right: bool = (x == len(row) - 1
-                       and j >= self.cell_size - wall_size * 2)
+        px = x * self.cell_size
+        py = y * self.cell_size
+        wall = self.wall_size
+        color = self.theme[1]["walls"]
 
-        # if we are in a border double the wall's thickness
-        if (top or bottom or left or right):
-            if (self.wall_size == wall_size):
-                self.wall_size *= 2
+        # North
+        if cell.walls & 1:
+            self.draw_rectangle(
+                px, py,
+                self.cell_size, wall,
+                color
+            )
 
-        # if we are in a cell corner that has a wall close, draw
-        if (
-            (i < self.wall_size or
-            i >= self.cell_size - self.wall_size)
-            and
-            (j < self.wall_size or
-             j >= self.cell_size - self.wall_size) 
-           ):
-            if (self.check_corner(x, y, cell, i, j)):
-                self.draw_pixel(x, y, i, j, self.theme[1]["walls"])
+        # West
+        if cell.walls & 8:
+            self.draw_rectangle(
+                px, py,
+                wall, self.cell_size,
+                color
+            )
 
-        # if we are in a cell wall and the wall is placed, draw
-        if ((i < self.wall_size and (cell.walls >> 0) & 1)  # top wall
-                or (i >= self.cell_size - self.wall_size
-                    and (cell.walls >> 2) & 1)  # bottom wall
-                or (j < self.wall_size and (cell.walls >> 3) & 1)  # left wall
-                or (j >= self.cell_size - self.wall_size
-                    and (cell.walls >> 1) & 1)):  # right wall
-            self.draw_pixel(x, y, i, j, self.theme[1]["walls"])
+        # East only on the right border
+        if x == self.mazegen.width - 1 and cell.walls & 2:
+            self.draw_rectangle(
+                px + self.cell_size - wall,
+                py,
+                wall,
+                self.cell_size,
+                color
+            )
 
-        # restart wall size if altered
-        if (self.wall_size != wall_size):
-            self.wall_size //= 2
+        # South only on the bottom border
+        if y == self.mazegen.height - 1 and cell.walls & 4:
+            self.draw_rectangle(
+                px,
+                py + self.cell_size - wall,
+                self.cell_size,
+                wall,
+                color
+            )
+
+    def draw_rectangle(self, x: int, y: int, width: int, height: int, color: COLOR) -> None:
+        for py in range(y, y + height):
+            start = self.offset(x, py)
+            end = start + width * 4
+
+            self.image_data[start:end] = bytes(color.value) * width
 
     def offset(self, x: int, y: int) -> int:
         """
@@ -247,57 +305,7 @@ class View:
         start = self.offset(px, py)
         self.image_data[start:start + 4] = bytes(color.value)
 
-    def check_corner(
-            self,
-            x: int,
-            y: int,
-            cell: Cell,
-            i: int,
-            j: int
-    ) -> bool:
-        """
-        Cheks if the given position is part of a cell corner that needs
-        to be drawn.
-        """
-        start: int = self.wall_size
-        end: int = self.cell_size - start
-        len_y = len(self.mazegen.grid[y]) - 1
-        len_x = len(self.mazegen.grid) - 1
-        if (i < start and j < start):
-            if (y > 0 and x > 0):
-                left_top_cell: Cell = self.mazegen.grid[
-                    y - 1][x - 1]
-                if ((cell.walls >> 0) & 1 or (cell.walls >> 3) & 1
-                        or (left_top_cell.walls >> 1) & 1
-                        or (left_top_cell.walls >> 2) & 1):
-                    return True
-        elif (j >= end and i < start):
-            if (y > 0
-                    and x < len_y):
-                right_top_cell: Cell = self.mazegen.grid[
-                    y - 1][x + 1]
-                if ((cell.walls >> 0) & 1 or (cell.walls >> 1) & 1
-                        or (right_top_cell.walls >> 2) & 1
-                        or (right_top_cell.walls >> 3) & 1):
-                    return True
-        elif (j < start and i >= end):
-            if (x > 0 and y < len_x):
-                left_bottom_cell: Cell = self.mazegen.grid[
-                    y + 1][x - 1]
-                if ((cell.walls >> 2) & 1 or (cell.walls >> 3) & 1
-                        or (left_bottom_cell.walls >> 0) & 1
-                        or (left_bottom_cell.walls >> 1) & 1):
-                    return True
-        elif (i >= end and j >= end):
-            if (y < len_x
-                    and x < len_y):
-                right_bottom_cell: Cell = self.mazegen.grid[
-                    y + 1][x + 1]
-                if ((cell.walls >> 2) & 1 or (cell.walls >> 1) & 1
-                        or (right_bottom_cell.walls >> 0) & 1
-                        or (right_bottom_cell.walls >> 3) & 1):
-                    return True
-        return False
+    
 
     def initialize_image(self) -> None:
         """
@@ -348,6 +356,30 @@ class View:
                                     opt)
             i -= 1
 
+    def setup_hooks(self) -> None:
+        """Register MLX event handlers."""
+        self.mlx.mlx_key_hook(
+            self.ptr[1],
+            self.on_key,
+            None
+        )
+
+        self.mlx.mlx_hook(
+            self.ptr[1],
+            33,
+            0,
+            self.on_destroy,
+            None
+        )
+
+    def on_key(self, keycode: int, _: Any) -> None:
+        """Handle keyboard input."""
+        self.key_handler(keycode)
+
+    def on_destroy(self, _: Any) -> None:
+        """Handle window close."""
+        self.clean_shutdown()
+
     def show_image(self) -> None:
         """
         Set the image in the window and add the key handler to it.
@@ -356,7 +388,7 @@ class View:
                                          int(self.horizontal_margin / 2),
                                          int(self.horizontal_margin / 2))
 
-        def on_key(keynum: int, _: Any) -> None:
+        """ def on_key(keynum: int, _: Any) -> None:
             self.key_handler(keynum)
 
         def on_destroy(_: Any) -> None:
@@ -365,4 +397,4 @@ class View:
         self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
         self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
         self.mlx.mlx_loop(self.ptr[0])
-        self.clean_shutdown()
+        self.clean_shutdown() """
