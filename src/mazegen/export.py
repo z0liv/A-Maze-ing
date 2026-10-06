@@ -7,7 +7,15 @@ def export_maze(
 ) -> None:
     """
     Function that writes the maze information into the
-    output file given by the mazegen.config.
+    output file.
+
+    Args:
+        grid (list[list[Cell]]): Represents a 2D list of Cells.
+        entry (Cell): Entry Cell of the maze.
+        exit (Cell): Exit Cell of the maze.
+        output_file (str): The name of the output file.
+        solution (list[Cell]): A list of Cells that are
+                              part of the solution path.
     """
     try:
         with open(output_file, "w") as file:
@@ -27,7 +35,7 @@ def get_solution_directions(solution: list[Cell]) -> str:
     with the next one to store the direction in the result
     string.
 
-    Parameters:
+    Args:
         solution (list[Cell]): A list of the cells that are part of the
                                solution.
     Returns:
@@ -64,12 +72,14 @@ def list_content(
     Looping the grid row by row adding cell by cell in the
     list to return as a string.
 
-    Parameters:
+    Args:
         mazegen (MazeGenerator): MazeGenerator object that stores the
         relevant information of the maze.
 
     Returns:
-        A list of each cell.walls transformed into hexadecimal.
+        A list of each cell.walls transformed into hexadecimal, the
+        entry and exit positions and the solution path in a string 
+        represented by the cardinal directions 'NESW'.
         formatted into the expected output format to use it in the
         'maze_analizer.py'
 
@@ -86,5 +96,6 @@ def list_content(
     content.append(f"{exit[0]},{exit[1]}")
     content.append("\n")
     content.append(get_solution_directions(solution))
+    content.append("\n")
 
     return content

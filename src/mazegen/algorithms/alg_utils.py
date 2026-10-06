@@ -138,7 +138,7 @@ def unvisit_all_cells(grid: list[list[Cell]]) -> None:
     Loops inside the grid to unvisit all the cells inside.
 
     Arguments:
-        mazegen (MazeGenerator): MazeGenerator class that contains the grid.
+        grid (list[list[Cell]]): Represents a 2D list of Cells.
     """
     for row in grid:
         for cell in row:
@@ -151,7 +151,7 @@ def active_solution_path(solution: list[Cell]) -> None:
     Loops inside the list of cells changing the in_solution bool.
 
     Args:
-        mazegen (MazeGenerator): MazeGenerator class that contains the grid.
+        solution (list[Cell]): A list of Cells that are part of the solution.
     """
     for cell in solution:
         cell.in_solution = True

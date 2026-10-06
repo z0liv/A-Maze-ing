@@ -10,12 +10,21 @@ def genmaze_dfs(
         Generate the maze using the Depth First Search algorithm.
 
         Args:
-            mazegen (MazeGenerator): The maze generator instance.
+            grid (list[list[Cell]]): Represents a 2D list of Cells.
+            entry (Cell): Entry Cell of the maze.
+            rnd (Random): Random instance based on the seed if it exists.
         Returns:
             A list of lists of cells that represents the grid.
     """
 
     def recursive_dfs(current: Cell) -> None:
+        """
+        Helper nested recursive function to generate the maze.
+
+        Args:
+            current (Cell): Current instance of Cell to evaluate with the
+                            next neighbour.
+        """
         current.visited = True
         while True:
             neighbours = get_unvisited_neighbours(current, grid)

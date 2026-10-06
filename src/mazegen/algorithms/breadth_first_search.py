@@ -5,6 +5,17 @@ from .alg_utils import get_connected_neighbours, unvisit_all_cells
 def solve_maze_bfs(
         grid: list[list[Cell]], entry: Cell, exit: Cell
 ) -> list[Cell]:
+    """
+    Function to solve the maze using the breadth first search algoritm.
+
+    Args:
+        grid (list[list[Cell]]): Represents a 2D list of Cells.
+        entry: Entry Cell of the maze.
+        entry: Exit Cell of the maze.
+    
+    Returns:
+        A list of Cells that represents the solution path of the maze.
+    """
 
     frontier: list[Cell] = [entry]
     visited: set[Cell] = {entry}
