@@ -16,7 +16,7 @@ class InvalidConfigError(Exception):
 
 class ParamsError(Exception):
     """
-    Exception raised when the parameters are invalid.
+    Exception raised when the Args are invalid.
     """
     def __init__(self, message: str) -> None:
         """

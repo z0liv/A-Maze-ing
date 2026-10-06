@@ -11,6 +11,11 @@ def genmaze_ab(
     """
         Generate the maze using the Aldous-Broder algorithm.
 
+        Args:
+            grid (list[list[Cell]]): Represents a 2D list of Cells.
+            entry (Cell): Entry Cell of the maze.
+            rnd: Random instance based on the seed if it exists.
+
         Returns:
             A list of lists of cells that represents the grid.
     """

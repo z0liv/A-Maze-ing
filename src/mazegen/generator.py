@@ -15,7 +15,18 @@ class MazeGenerator:
     Class that will generate the maze.
 
     Attributes:
-
+        width (int): The width of the maze.
+        height (int): The height of the maze.
+        entry_pos (tuple[int, int]): Tuple that represents the x, y position
+                                    of the entry of the maze.
+        exit_pos (tuple[int, int]): Tuple that represents the x, y position
+                                    of the exit of the maze.
+        use_seed (bool): Indicates if the maze it's going to be
+                        generated via seed.
+        perfect (bool): Indicates if the generated maze it's going to be
+                        perfect or imperfect.
+        algorithm (str): String to select an specific algorithm to generate
+                        the maze.
         grid (list[list[Cell]]): Represents a 2D list of Cells.
         entry (Cell): Indicates which cell is the entrance of the maze.
         exit (Cell): Indicates which cell is the exit of the maze.
@@ -38,9 +49,8 @@ class MazeGenerator:
             algorithm: str = "ab",
     ) -> None:
         """
-        Initialize the maze.
-
-        We do the config file parsing here.
+        Initialize the maze generating the grid, using an algoritm to
+        generate a maze, store the solution path and exporting it.
         """
 
         self.width = width
@@ -81,6 +91,10 @@ class MazeGenerator:
         self.generate()
 
     def generate(self) -> None:
+        """
+        Helper function to generate the maze based on the selected
+        algorithm, store the solution path and exporting it.
+        """
         if self.seed is not None and self.use_seed:
             rnd = Random(self.seed)
         else:
@@ -99,10 +113,6 @@ class MazeGenerator:
     def generate_grid(self) -> list[list[Cell]]:
         """
         Generate the grid of cells that will be used to create the maze.
-
-        Args:
-            config (Config): The configuration model that contains the
-                information about the maze.
 
         Returns:
             A 2D list of Cell objects that represents the grid of cells.
