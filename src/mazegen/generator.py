@@ -4,7 +4,7 @@ from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
     solve_maze_bfs, active_solution_path,
-    get_connected_neighbours)
+    get_connected_neighbours, opposite)
 from .cell import Cell
 from .export import export_maze
 from .enums import DIRECTION
@@ -131,15 +131,21 @@ class MazeGenerator:
             grid.append(row)
         return grid
 
-    def valid_wall_removal(
+    def remove_wall(
             self,
             target_cell: Cell,
             direction: DIRECTION
     ) -> None:
-        check_open_areas(self.grid)
-        check_full_conectivity(self.grid, self.entry, self.has_pattern,
-                               self.height, self.width)
-
+        if check_open_areas(self.grid):
+            target_cell.walls &= ~direction.value
+            dx, dy = {
+                DIRECTION.NORTH: (0, -1),
+                DIRECTION.EAST: (1, 0),
+                DIRECTION.SOUTH: (0, 1),
+                DIRECTION.WEST: (-1, 0),
+            }[direction]
+            neighbour: Cell = self.grid[target_cell.position[1] + dy][target_cell.position[0] + dx]
+            neighbour.walls &= ~opposite(direction).value
 
 def check_full_conectivity(
         grid: list[list[Cell]],
