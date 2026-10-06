@@ -4,6 +4,7 @@ from .themes import THEMES
 from .config import Config
 from mlx import Mlx
 from typing import Any
+import time
 
 
 class View:
@@ -35,8 +36,10 @@ class View:
     image_data: Any
     size_line: int
     show_solution: bool = False
-    """ solution_finished: bool = False
-    solution_index: int = 0 """
+    animating: bool = False
+    animation_index: int = 0
+    animation_delay: float = 0.05
+    last_animation_delay: float = 0.0
     ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
     theme: tuple[str, dict[str, COLOR]] = THEMES[0]
@@ -81,9 +84,10 @@ class View:
         elif keycode == 50 or keycode == 65433:
             if self.show_solution:
                 self.show_solution = False
+                self.draw_and_show()
             else:
                 self.show_solution = True
-            self.draw_and_show()
+                self.toggle_solution_animation()
         elif keycode == 51 or keycode == 65435:
             bg = self.theme[1]["background"]
             primary = self.theme[1]["walls"]
@@ -130,6 +134,20 @@ class View:
     def clean_shutdown(self) -> None:
         self.mlx.mlx_loop_exit(self.ptr[0])
 
+    def toggle_solution_animation(self) -> None:
+        """Start or stop the solution animation."""
+
+        if self.animating:
+            self.animating = False
+            return
+
+        self.animation_index = 0
+        self.last_animation_delay = 0.0
+        self.animating = True
+
+        self.draw_complete_grid()
+        self.show_image()
+
     def draw_solution_step(self, cell: Cell) -> None:
         """Draw one solution cell."""
 
@@ -149,10 +167,18 @@ class View:
         if not self.animating:
             return
 
+        now = time.time()
+
+        if now - self.last_animation_delay < self.animation_delay:
+            return
+
+        self.last_animation_delay = now
+
         if self.animation_index >= len(self.mazegen.solution):
             self.animating = False
             return
-
+        if self.animation_index == 0:
+            self.animation_index += 1
         cell = self.mazegen.solution[self.animation_index]
 
         self.draw_solution_step(cell)
@@ -216,10 +242,9 @@ class View:
             color = self.theme[1]["entry"]
         elif cell.is_exit:
             color = self.theme[1]["exit"]
-        elif self.show_solution and cell.in_solution:
-            color = self.theme[1]["solution"]
         else:
             return
+        
 
         self.draw_rectangle(
             px,
@@ -379,6 +404,11 @@ class View:
             0,
             self.on_destroy,
             None
+        )
+        self.mlx.mlx_loop_hook(
+        self.ptr[0],
+        self.animation_loop,
+        None
         )
 
     def on_key(self, keycode: int, _: Any) -> None:
