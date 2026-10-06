@@ -5,7 +5,6 @@ from .config import Config
 from mlx import Mlx
 from typing import Any
 
-
 class View:
 
     """
@@ -35,6 +34,8 @@ class View:
     image_data: Any
     size_line: int
     show_solution: bool = False
+    """ solution_finished: bool = False
+    solution_index: int = 0 """
     ptr: tuple[int | None, ...]  # [mlx, win, image]
     mlx: Mlx
     theme: tuple[str, dict[str, COLOR]] = THEMES[0]
@@ -160,9 +161,9 @@ class View:
         then draws the walls with the specified color in the theme.
         """
         wall_size = self.wall_size
-        self.draw_pixel(x, y, cell, i, j, self.theme[1]["background"])
+        self.draw_pixel(x, y, i, j, self.theme[1]["background"])
         if (cell.is_pattern):
-            self.draw_pixel(x, y, cell, i, j, self.theme[1]["pattern"])
+            self.draw_pixel(x, y, i, j, self.theme[1]["pattern"])
         elif (cell.is_entry):
             if (
                 i > self.wall_size
@@ -170,7 +171,7 @@ class View:
                 and j > self.wall_size
                 and j < self.cell_size - self.wall_size
                ):
-                self.draw_pixel(x, y, cell, i, j, self.theme[1]["entry"])
+                self.draw_pixel(x, y, i, j, self.theme[1]["entry"])
         elif (cell.is_exit):
             if (
                 i > self.wall_size
@@ -178,10 +179,10 @@ class View:
                 and j > self.wall_size
                 and j < self.cell_size - self.wall_size
                ):
-                self.draw_pixel(x, y, cell, i, j, self.theme[1]["exit"])
+                self.draw_pixel(x, y, i, j, self.theme[1]["exit"])
         if (self.show_solution and cell.in_solution):
             if not cell.is_entry and not cell.is_exit:
-                self.draw_pixel(x, y, cell, i, j, self.theme[1]["solution"])
+                self.draw_pixel(x, y, i, j, self.theme[1]["solution"])
 
         # define maze borders
         top: bool = (y == 0 and i <= wall_size * 2)
@@ -199,8 +200,15 @@ class View:
                 self.wall_size *= 2
 
         # if we are in a cell corner that has a wall close, draw
-        if (self.check_corner(x, y, cell, i, j)):
-            self.draw_pixel(x, y, cell, i, j, self.theme[1]["walls"])
+        if (
+            (i < self.wall_size or
+            i >= self.cell_size - self.wall_size)
+            and
+            (j < self.wall_size or
+             j >= self.cell_size - self.wall_size) 
+           ):
+            if (self.check_corner(x, y, cell, i, j)):
+                self.draw_pixel(x, y, i, j, self.theme[1]["walls"])
 
         # if we are in a cell wall and the wall is placed, draw
         if ((i < self.wall_size and (cell.walls >> 0) & 1)  # top wall
@@ -209,7 +217,7 @@ class View:
                 or (j < self.wall_size and (cell.walls >> 3) & 1)  # left wall
                 or (j >= self.cell_size - self.wall_size
                     and (cell.walls >> 1) & 1)):  # right wall
-            self.draw_pixel(x, y, cell, i, j, self.theme[1]["walls"])
+            self.draw_pixel(x, y, i, j, self.theme[1]["walls"])
 
         # restart wall size if altered
         if (self.wall_size != wall_size):
@@ -226,7 +234,6 @@ class View:
             self,
             x: int,
             y: int,
-            cell: Cell,
             i: int,
             j: int,
             color: COLOR
@@ -254,6 +261,8 @@ class View:
         """
         start: int = self.wall_size
         end: int = self.cell_size - start
+        len_y = len(self.mazegen.grid[y]) - 1
+        len_x = len(self.mazegen.grid) - 1
         if (i < start and j < start):
             if (y > 0 and x > 0):
                 left_top_cell: Cell = self.mazegen.grid[
@@ -264,7 +273,7 @@ class View:
                     return True
         elif (j >= end and i < start):
             if (y > 0
-                    and x < len(self.mazegen.grid[y]) - 1):
+                    and x < len_y):
                 right_top_cell: Cell = self.mazegen.grid[
                     y - 1][x + 1]
                 if ((cell.walls >> 0) & 1 or (cell.walls >> 1) & 1
@@ -272,7 +281,7 @@ class View:
                         or (right_top_cell.walls >> 3) & 1):
                     return True
         elif (j < start and i >= end):
-            if (x > 0 and y < len(self.mazegen.grid) - 1):
+            if (x > 0 and y < len_x):
                 left_bottom_cell: Cell = self.mazegen.grid[
                     y + 1][x - 1]
                 if ((cell.walls >> 2) & 1 or (cell.walls >> 3) & 1
@@ -280,8 +289,8 @@ class View:
                         or (left_bottom_cell.walls >> 1) & 1):
                     return True
         elif (i >= end and j >= end):
-            if (y < len(self.mazegen.grid) - 1
-                    and x < len(self.mazegen.grid[y]) - 1):
+            if (y < len_x
+                    and x < len_y):
                 right_bottom_cell: Cell = self.mazegen.grid[
                     y + 1][x + 1]
                 if ((cell.walls >> 2) & 1 or (cell.walls >> 1) & 1
