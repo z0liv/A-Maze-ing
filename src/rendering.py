@@ -153,13 +153,11 @@ class View:
 
         x, y = cell.position
 
-        margin = self.cell_size // 3
-
         self.draw_rectangle(
-            x * self.cell_size + margin,
-            y * self.cell_size + margin,
-            self.cell_size - 2 * margin,
-            self.cell_size - 2 * margin,
+            x * self.cell_size + 2,
+            y * self.cell_size + 2,
+            self.cell_size - 5,
+            self.cell_size - 5,
             self.theme[1]["solution"]
         )
 
@@ -174,7 +172,7 @@ class View:
 
         self.last_animation_delay = now
 
-        if self.animation_index >= len(self.mazegen.solution):
+        if self.animation_index >= len(self.mazegen.solution) - 1:
             self.animating = False
             return
         if self.animation_index == 0:
