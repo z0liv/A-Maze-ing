@@ -1,5 +1,5 @@
 from collections import deque
-from random import Random, choice
+from random import Random, shuffle
 from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
@@ -106,38 +106,38 @@ class MazeGenerator:
         else:
             self.grid = genmaze_dfs(self.grid, self.entry, rnd)
 
-        """ allowed_dead_ends = 2
-        dead_end = self.has_dead_ends()
-        while dead_end is not None:
-            cell, direction, is_pattern_dead_end = dead_end
-            if is_pattern_dead_end:
-                if allowed_dead_ends > 0:
-                    allowed_dead_ends -= 1
-                    dead_end = self.has_dead_ends()
-                    continue
-            self.remove_wall_if_valid(cell, direction)
-            dead_end = self.has_dead_ends() """
-
-        allowed_dead_ends = 2
-        while True:
-            dead_ends = self.get_dead_ends()
-            if not dead_ends:
-                break
-            normal_dead_ends = [
-                dead_end for dead_end in dead_ends
-                if not dead_end[2]
-            ]
-            pattern_dead_ends = [
-                dead_end for dead_end in dead_ends
-                if dead_end[2]
-            ]
-            if normal_dead_ends:
-                cell, direction, _ = choice(normal_dead_ends)
-            elif len(pattern_dead_ends) <= allowed_dead_ends:
-                break
-            else:
-                cell, direction, _ = choice(pattern_dead_ends)
-            self.remove_wall_if_valid(cell, direction)
+        if (not self.perfect):
+            max_pattern_dead_ends = 2
+            while True:
+                dead_ends = self.get_dead_ends()
+                if not dead_ends:
+                    break
+                normal_dead_ends = [
+                    dead_end for dead_end in dead_ends
+                    if not dead_end[1]
+                ]
+                pattern_dead_ends = [
+                    dead_end for dead_end in dead_ends
+                    if dead_end[1]
+                ]
+                if normal_dead_ends:
+                    candidates = normal_dead_ends
+                elif len(pattern_dead_ends) <= max_pattern_dead_ends:
+                    break
+                else:
+                    candidates = pattern_dead_ends
+                removed = False
+                for cell, _ in candidates:
+                    directions = self.get_removable_walls(cell)
+                    shuffle(directions)
+                    for direction in directions:
+                        if self.remove_wall_if_valid(cell, direction):
+                            removed = True
+                            break
+                    if removed:
+                        break
+                if not removed:
+                    break
 
         self.solution = solve_maze_bfs(self.grid, self.entry, self.exit)
 
@@ -166,46 +166,65 @@ class MazeGenerator:
             grid.append(row)
         return grid
 
-    def get_dead_ends(self) -> list[tuple[Cell, DIRECTION, bool]]:
-        dead_ends: list[tuple[Cell, DIRECTION, bool]] = []
+    def get_dead_ends(self) -> list[tuple[Cell, bool]]:
+        dead_ends: list[tuple[Cell, bool]] = []
+
         for row in self.grid:
             for cell in row:
                 if cell.is_pattern:
                     continue
                 neighbours = get_neighbours(cell, self.grid)
-                not_connected: list[tuple[Cell, DIRECTION]] = get_not_connected_neighbours(cell, self.grid)
-                if len(neighbours) - len(not_connected) != 1:
+                connected = get_connected_neighbours(cell, self.grid)
+                if len(connected) != 1:
                     continue
                 pattern_neighbours = sum(
-                    neighbour.is_pattern for neighbour, _ in not_connected
+                    neighbour.is_pattern
+                    for neighbour, _ in neighbours
+                    if neighbour not in [connected[0][0]]
                 )
                 is_pattern_dead_end = pattern_neighbours == 3
-                valid_neighbours = [
-                    neighbour for neighbour in not_connected
-                    if not neighbour[0].is_pattern
-                ]
-                if valid_neighbours:
-                    chosen = choice(valid_neighbours)
-                    dead_ends.append((cell, chosen[1], is_pattern_dead_end))
+                dead_ends.append((cell, is_pattern_dead_end))
         return dead_ends
+
+    def get_removable_walls(
+            self,
+            cell: Cell
+    ) -> list[DIRECTION]:
+        neighbours = get_not_connected_neighbours(cell, self.grid)
+        return [
+            direction for neighbour, direction in neighbours
+            if not neighbour.is_pattern
+        ]
 
     def remove_wall_if_valid(
             self,
             target_cell: Cell,
             direction: DIRECTION
-    ) -> None:
-            target_cell.walls &= ~direction.value
-            dx, dy = {
-                DIRECTION.NORTH: (0, -1),
-                DIRECTION.EAST: (1, 0),
-                DIRECTION.SOUTH: (0, 1),
-                DIRECTION.WEST: (-1, 0),
-            }[direction]
-            neighbour: Cell = self.grid[target_cell.position[1] + dy][target_cell.position[0] + dx]
-            neighbour.walls &= ~opposite(direction).value
-            if check_open_areas(self.grid):
-                target_cell.walls |= direction.value
-                neighbour.walls |= opposite(direction).value
+    ) -> bool:
+        dx, dy = {
+            DIRECTION.NORTH: (0, -1),
+            DIRECTION.EAST: (1, 0),
+            DIRECTION.SOUTH: (0, 1),
+            DIRECTION.WEST: (-1, 0),
+        }[direction]
+
+        x = target_cell.position[0] + dx
+        y = target_cell.position[1] + dy
+
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            return False
+
+        neighbour = self.grid[y][x]
+
+        target_cell.walls &= ~direction.value
+        neighbour.walls &= ~opposite(direction).value
+
+        if check_open_areas(self.grid):
+            target_cell.walls |= direction.value
+            neighbour.walls |= opposite(direction).value
+            return False
+
+        return True
 
 
 def check_full_conectivity(
