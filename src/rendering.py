@@ -279,39 +279,71 @@ class View:
 
         # North
         if cell.walls & 1:
-            self.draw_rectangle(
-                px, py,
-                self.cell_size, wall,
-                color
-            )
+            if y == 0 or y == self.mazegen.width - 1:
+                self.draw_rectangle(
+                    px, py,
+                    self.cell_size, wall * 2,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px, py,
+                    self.cell_size, wall,
+                    color
+                )
 
         # West
         if cell.walls & 8:
-            self.draw_rectangle(
-                px, py,
-                wall, self.cell_size,
-                color
-            )
+            if x == 0:
+                self.draw_rectangle(
+                    px, py,
+                    wall * 2, self.cell_size,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px, py,
+                    wall, self.cell_size,
+                    color
+                )
 
-        # East only on the right border
-        if x == self.mazegen.width - 1 and cell.walls & 2:
-            self.draw_rectangle(
-                px + self.cell_size - wall,
-                py,
-                wall,
-                self.cell_size,
-                color
-            )
+        # East
+        if cell.walls & 2:
+            if x == self.mazegen.width - 1:
+                self.draw_rectangle(
+                    px + self.cell_size - (wall * 2),
+                    py,
+                    wall * 2,
+                    self.cell_size,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px + self.cell_size - wall,
+                    py,
+                    wall * 2,
+                    self.cell_size,
+                    color
+                )
 
-        # South only on the bottom border
-        if y == self.mazegen.height - 1 and cell.walls & 4:
-            self.draw_rectangle(
-                px,
-                py + self.cell_size - wall,
-                self.cell_size,
-                wall,
-                color
-            )
+        # South
+        if cell.walls & 4:
+            if y == self.mazegen.height - 1:
+                self.draw_rectangle(
+                    px,
+                    py + self.cell_size - (wall * 2),
+                    self.cell_size,
+                    wall * 2,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px,
+                    py + self.cell_size - wall,
+                    self.cell_size,
+                    wall,
+                    color
+                )
 
     def draw_rectangle(
             self, x: int, y: int,
