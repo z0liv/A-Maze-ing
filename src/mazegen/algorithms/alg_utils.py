@@ -113,6 +113,47 @@ def get_connected_neighbours(
     return neighbours
 
 
+def get_not_connected_neighbours(
+        cell: Cell,
+        grid: list[list[Cell]]
+) -> list[tuple[Cell, DIRECTION]]:
+    """
+    Get the unconnected neighbours of a given cell in the grid. Connected meaning
+    that the wall between both cells is not active.
+
+    Args:
+        cell (Cell): The cell for which to find neighbours.
+        grid (list[list[Cell]]): The grid of cells.
+
+    Returns:
+        A list of neighboring Cell objects.
+    """
+    neighbours: list[tuple[Cell, DIRECTION]] = []
+
+    x, y = cell.position
+    if y > 0:
+        north = grid[y - 1][x]
+        if cell.walls & DIRECTION.NORTH.value:
+            neighbours.append((north, DIRECTION.NORTH))
+
+    if x < len(grid[0]) - 1:
+        east = grid[y][x + 1]
+        if cell.walls & DIRECTION.EAST.value:
+            neighbours.append((east, DIRECTION.EAST ))
+
+    if y < len(grid) - 1:
+        south = grid[y + 1][x]
+        if cell.walls & DIRECTION.SOUTH.value:
+            neighbours.append((south, DIRECTION.SOUTH))
+
+    if x > 0:
+        west = grid[y][x - 1]
+        if cell.walls & DIRECTION.WEST.value:
+            neighbours.append((west, DIRECTION.WEST))
+
+    return neighbours
+
+
 def get_free_cells(grid: list[list[Cell]]) -> int:
     """
     Function that counts how many cells in the grid are not part of
