@@ -279,7 +279,7 @@ class View:
 
         # North
         if cell.walls & 1:
-            if y == 0 or y == self.mazegen.width - 1:
+            if y == 0 or y == self.mazegen.height - 1:
                 self.draw_rectangle(
                     px, py,
                     self.cell_size, wall * 2,
