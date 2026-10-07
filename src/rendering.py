@@ -82,11 +82,19 @@ class View:
         Handles the user interactions through specific keys
         """
         if keycode == 49 or keycode == 65436:
+            self.show_solution = False
+            self.animating = False
             self.redo_maze()
         elif keycode == 50 or keycode == 65433:
             if self.show_solution:
                 self.show_solution = False
+                self.animating = False
                 self.draw_and_show()
+            elif self.animation_index == len(self.mazegen.solution) - 1:
+                self.show_solution = False
+                self.animating = False
+                self.animation_index = 0
+                self.draw_and_show
             else:
                 self.show_solution = True
                 self.toggle_solution_animation()
@@ -95,8 +103,12 @@ class View:
             primary = self.theme[1]["walls"]
             self.theme[1]['background'] = primary
             self.theme[1]['walls'] = bg
+            self.show_solution = False
+            self.animating = False
             self.draw_and_show()
         elif keycode == 52 or keycode == 65430:
+            self.show_solution = False
+            self.animating = False
             if self.theme[0] == 'nostromo':
                 self.theme = THEMES[1]
             elif self.theme[0] == 'nautilus':
@@ -141,6 +153,10 @@ class View:
 
         if self.animating:
             self.animating = False
+            self.show_solution = False
+            self.animation_index = 0
+            self.last_animation_delay = 0.0
+            self.draw_and_show()
             return
 
         self.animation_index = 0
@@ -164,7 +180,9 @@ class View:
         )
 
     def animation_loop(self, _: Any) -> None:
-        if not self.animating:
+        if not self.animating or not self.show_solution:
+            self.show_solution = False
+            self.animating = False
             return
 
         now = time.time()
@@ -386,7 +404,7 @@ class View:
                                         self.ptr[1],
                                         int(self.horizontal_margin / 2),
                                         py,
-                                        COLOR.WHITE,
+                                        0xFFFFFF,
                                         opt)
                 i -= 1
         else:
@@ -394,7 +412,7 @@ class View:
                                     self.ptr[1],
                                     int(self.horizontal_margin / 2),
                                     self.window_height - self.cell_size * 2,
-                                    COLOR.WHITE,
+                                    0xFFFFFF,
                                     options)
 
     def setup_hooks(self) -> None:
