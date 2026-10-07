@@ -15,7 +15,9 @@ class Cell:
         is_exit (bool): A boolean that tells if the cell
                          is the exit of the maze.
         visited (bool): A boolean that tells if
-                        the cell is part of the solution of the maze.
+                        the cell has been visited by the algorithms.
+        in_solution (bool): A boolean that tells if
+                                the cell is part of the solution of the maze.
     """
     position: tuple[int, int]
     walls: int

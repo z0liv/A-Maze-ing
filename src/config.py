@@ -21,6 +21,7 @@ class Config(BaseModel):
         output_file (str): Name of the output file for the generated maze.
         perfect (bool): Whether to generate a perfect or imperfect maze.
         seed (int): Seed used to generate a specific maze.
+        algorithm (str): String that determines the mazegenerator algorithm.
     """
     width: int = Field(gt=1, le=34)
     height: int = Field(gt=1, le=14)
@@ -38,7 +39,9 @@ class Config(BaseModel):
         """
         Validate the entry and exit coordinates against the maze dimensions.
         Check if the entry is the same cell as the exit.
-        Check if the entry or the exit are in the border of the maze.
+        Check if the entry or the exit are outside of the bounds of the maze.
+        Validates if the output_file name it's appropiate.
+        Validates if the algorithm choose it's appropiate.
         """
         if (self.output_file == ""):
             self.output_file = "output_maze.txt"
@@ -119,6 +122,8 @@ def load_config_model() -> Config:
                     raise ValueError(prefix + " must have 'key=value' syntax")
         config_model: Config = Config(**data)
         return config_model
+    except PermissionError:
+        raise PermissionError
     except ValidationError as val:
         errors: list[str] = []
         for error in val.errors():

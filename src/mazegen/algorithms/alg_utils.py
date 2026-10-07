@@ -118,8 +118,8 @@ def get_not_connected_neighbours(
         grid: list[list[Cell]]
 ) -> list[tuple[Cell, DIRECTION]]:
     """
-    Get the unconnected neighbours of a given cell in the grid. Connected meaning
-    that the wall between both cells is not active.
+    Get the unconnected neighbours of a given cell in the grid.
+    Connected meaning that the wall between both cells is not active.
 
     Args:
         cell (Cell): The cell for which to find neighbours.
@@ -139,7 +139,7 @@ def get_not_connected_neighbours(
     if x < len(grid[0]) - 1:
         east = grid[y][x + 1]
         if cell.walls & DIRECTION.EAST.value:
-            neighbours.append((east, DIRECTION.EAST ))
+            neighbours.append((east, DIRECTION.EAST))
 
     if y < len(grid) - 1:
         south = grid[y + 1][x]

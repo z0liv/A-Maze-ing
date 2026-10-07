@@ -21,7 +21,14 @@ class View:
         cell_size (int): An integer that stores the size of the cells in pixels
         wall_sise (int): An integer that stores the size of each maze wall in
             pixels
+        image_data (Any): Helper variable to store the data of the image.
         size_line (int): An integer that stores the size of a line of pixels
+        show_solution (bool): Boolean helper to show the solution animated.
+        animating (bool): Boolean that tells if it's actual animating.
+        animation_index (int): Index of the solution list.
+        animation_delay (float): Float that represents the delay of the animation.
+        last_animation_delay (float): Float helper that represents the last delay
+                                     in the animating loop.
         ptr (tuple[int | None, ...]): A tuple of mlx pointers
         mlx (Mlx): The mlx object
         theme (tuple[str, dict[str, COLOR]]) : A tuple that stores the name of
@@ -66,7 +73,11 @@ class View:
 
     def __init__(self, mazegen: MazeGenerator, config: Config) -> None:
         """
-        Initialize the view with the attributes defined previously.
+        Initialize the view, mazegen, config, window, margin
+
+        Args:
+            mazegen (MazeGenerator): Instance of the MazeGenerator class.
+            config (Config): Instance of the Config class to init the mazegen.
         """
         self.config = config
         self.mazegen = mazegen
@@ -79,7 +90,10 @@ class View:
 
     def key_handler(self, keycode: int) -> None:
         """
-        Handles the user interactions through specific keys
+        Handles the user interactions through specific keys.
+
+        Args:
+            keycode (int): Keycode to evaluate.
         """
         if keycode == 49 or keycode == 65436:
             self.show_solution = False
@@ -122,8 +136,8 @@ class View:
 
     def redo_maze(self) -> None:
         """
-        Creates new maze generator and random objects and calls the algorithm,
-        the export function and the function that draws and shows the maze
+        Creates a new instance of the MazeGenerator class.
+        And displays the new maze.
         """
         cfg = self.config
         self.mazegen = MazeGenerator(
@@ -135,8 +149,9 @@ class View:
 
     def generate_view(self) -> None:
         """
-        The main method of the class, initializes the window and the image,
-        and draws the maze along with the user interaction options.
+        The main method of the class, initializes the image, draws the grid
+        writes the user interactions, shows the image, starts the mlx loop
+        and catches the setup hooks.
         """
         self.initialize_image()
         self.draw_complete_grid()
@@ -146,6 +161,10 @@ class View:
         self.mlx.mlx_loop(self.ptr[0])
 
     def clean_shutdown(self) -> None:
+        """
+        TODO: Search the clean exit
+        Cleans the pointers and does a safe exit.
+        """
         self.mlx.mlx_loop_exit(self.ptr[0])
 
     def toggle_solution_animation(self) -> None:
@@ -167,7 +186,12 @@ class View:
         self.show_image()
 
     def draw_solution_step(self, cell: Cell) -> None:
-        """Draw one solution cell."""
+        """
+        Draw one solution cell.
+
+        Args:
+            cell (Cell): Cell to draw.
+        """
 
         x, y = cell.position
 
@@ -180,6 +204,10 @@ class View:
         )
 
     def animation_loop(self, _: Any) -> None:
+        """
+        Loops inside the solution list of Cells drawing
+        cell by cell.
+        """
         if not self.animating or not self.show_solution:
             self.show_solution = False
             self.animating = False
@@ -207,9 +235,9 @@ class View:
 
     def draw_and_show(self) -> None:
         """
-        Calls the fucntion that writes the user interaction options, then the
-        one that draws the grid, finally the one that shows the image that
-        contains all the prevoiusly drawn pixels.
+        Writes the options, then draws the complete grid,
+        finally shows the image that contains
+        all the prevoiusly drawn pixels.
         """
         self.write_options()
         self.draw_complete_grid()
@@ -217,8 +245,8 @@ class View:
 
     def draw_complete_grid(self) -> None:
         """
-        For each pixel in each cell, calls a function that decides if the pixel
-        needs to be drawn.
+        Draws the background of the grid.
+        Then loops inside the grid and draw cell by cell.
         """
         self.set_background()
 
@@ -229,6 +257,11 @@ class View:
     def draw_cell(self, x: int, y: int, cell: Cell) -> None:
         """
         Function to draw independent Cells.
+        Drawing the content of the cell and then drawing the walls.
+        Args:
+            x (int): Horizontal position to draw the given cell.
+            y (int): Vertical position to draw the given cell.
+            cell (Cell): Cell instance to draw.
         """
         self.draw_cell_content(x, y, cell)
         self.draw_cell_walls(x, y, cell)
@@ -247,6 +280,15 @@ class View:
                 self.image_data[start:start + 4] = color
 
     def draw_cell_content(self, x: int, y: int, cell: Cell) -> None:
+        """
+        Draw the cell content such as if the cell is part of the
+        pattern, if it's the entry cell or if it's the exit one.
+
+        Args:
+            x (int): Horizontal position to draw the given cell.
+            y (int): Vertical position to draw the given cell.
+            cell (Cell): Cell instance to draw.
+        """
         margin = self.wall_size
 
         px = x * self.cell_size + margin
@@ -271,6 +313,14 @@ class View:
         y: int,
         cell: Cell
     ) -> None:
+        """
+        Draw the cell walls by the walls attribute of the Cell.
+
+        Args:
+            x (int): Horizontal position to draw the given cell.
+            y (int): Vertical position to draw the given cell.
+            cell (Cell): Cell instance to draw.
+        """
 
         px = x * self.cell_size
         py = y * self.cell_size
@@ -349,6 +399,16 @@ class View:
             self, x: int, y: int,
             width: int, height: int, color: COLOR
     ) -> None:
+        """
+        Draws a rectangle with the specific parameters.
+
+        Args:
+            x (int): Horizontal position to draw the given cell.
+            y (int): Vertical position to draw the given cell.
+            width (int): Horizontal position to draw the rectangle.
+            height (int): Vertical position to draw the rectangle.
+            color (COLOR): Hexadecimal value of the color to draw.
+        """
         for py in range(y, y + height):
             start = self.offset(x, py)
             end = start + width * 4
@@ -359,6 +419,12 @@ class View:
         """
         Calculates the position of the pixel according to the size of a pixel
         and the size of each line.
+
+        Args:
+            x (int): Horizontal position.
+            y (int): Vertical position.
+        Returns:
+            A calculated position of the pixel to draw.
         """
         return y * self.size_line + x * 4
 
@@ -373,6 +439,12 @@ class View:
         """
         Calculates the pixel position and modifies the bytes of the image that
         belong to that position with a specified color.
+        Args:
+            x (int): Horizontal position.
+            y (int): Vertical position.
+            i (int): Horizontal position of the current cell.
+            j (int): Vertical position of the current cell.
+            color (COLOR): Hexadecimal value of the color to draw. 
         """
         px = x * self.cell_size + j
         py = y * self.cell_size + i
@@ -381,7 +453,7 @@ class View:
 
     def initialize_image(self) -> None:
         """
-        Initializes the graphics, the window and the image with its data.
+        Initializes the image, the window and the image with its data.
         """
         self.mlx = Mlx()
         mlx_ptr = self.mlx.mlx_init()
@@ -448,17 +520,26 @@ class View:
                                     options)
 
     def setup_hooks(self) -> None:
-        """Register MLX event handlers."""
+        """
+        Register MLX event handlers.
+        """
         self.mlx.mlx_key_hook(self.ptr[1], self.on_key, None)
         self.mlx.mlx_hook(self.ptr[1], 33, 0, self.on_destroy, None)
         self.mlx.mlx_loop_hook(self.ptr[0], self.animation_loop, None)
 
     def on_key(self, keycode: int, _: Any) -> None:
-        """Handle keyboard input."""
+        """
+        Handle keyboard input.
+
+        Args:
+            keycode (int): keycode of the keyboard.
+        """
         self.key_handler(keycode)
 
     def on_destroy(self, _: Any) -> None:
-        """Handle window close."""
+        """
+        Handle window close.
+        """
         self.clean_shutdown()
 
     def show_image(self) -> None:

@@ -5,6 +5,13 @@ from src.config import load_config_model
 
 
 def main() -> None:
+    """
+    Main function of the project.
+    
+    Reads the config file and stores the values on the
+    Config instance and instances the MazeGenerator
+    loads the instances into the View class and generates the view.
+    """
     try:
         cfg = load_config_model()
         use_seed = False
@@ -17,13 +24,20 @@ def main() -> None:
         )
         view = View(mazegen, cfg)
         view.generate_view()
+    except ParamsError as error:
+        print("[ERROR]", error)
+    except InvalidConfigError as error:
+        print("[ERROR]", error)
+    except PermissionError as error:
+        print(error)
+    except FileNotFoundError as error:
+        print(error)
+    except KeyboardInterrupt as error:
+        print(error)
+    except OSError as error:
+        print(error) 
     except Exception as error:
-        if isinstance(error, ParamsError):
-            print("[ERROR]", error)
-        elif isinstance(error, InvalidConfigError):
-            print("[ERROR]", error)
-        else:
-            print(error)
+        print(error)
 
 
 if __name__ == "__main__":
