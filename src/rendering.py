@@ -172,10 +172,10 @@ class View:
         x, y = cell.position
 
         self.draw_rectangle(
-            x * self.cell_size + 2,
-            y * self.cell_size + 2,
-            self.cell_size - 5,
-            self.cell_size - 5,
+            x * self.cell_size + 4,
+            y * self.cell_size + 4,
+            self.cell_size - 10,
+            self.cell_size - 10,
             self.theme[1]["solution"]
         )
 
