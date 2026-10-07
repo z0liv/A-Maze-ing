@@ -70,6 +70,8 @@ class View:
         """
         self.config = config
         self.mazegen = mazegen
+        if self.mazegen.width >= 25:
+            self.vertical_margin = self.horizontal_margin * 2
         self.window_width = (mazegen.width * self.cell_size
                              + self.horizontal_margin)
         self.window_height = (mazegen.height * self.cell_size
@@ -242,15 +244,8 @@ class View:
             color = self.theme[1]["exit"]
         else:
             return
-        
 
-        self.draw_rectangle(
-            px,
-            py,
-            size,
-            size,
-            color
-        )
+        self.draw_rectangle(px, py, size, size, color)
 
     def draw_cell_walls(
         self,
@@ -360,15 +355,21 @@ class View:
         """
         Function that writes the user interaction texts into the window.
         """
-        options: list[str]
+        options: list[str] | str
         if len(self.mazegen.grid[0]) > 6:
-            options = [
-                "1. Re-generate a new maze",
-                "2. Show / Hide the shortest path",
-                "3. Rotate the wall colours",
-                "4. Switch theme",
-                "5. Exit",
-            ]
+            if len(self.mazegen.grid[0]) >= 25:
+                options = ("1. Re-generate a new maze"
+                           + "   2. Show / Hide the shortest path"
+                           + "   3. Rotate the wall colours"
+                           + "   4. Switch theme"
+                           + "   5. Exit")
+            else:
+                options = [
+                    "1. Re-generate a new maze",
+                    "2. Show / Hide the shortest path",
+                    "3. Rotate the wall colours",
+                    "4. Switch theme",
+                    "5. Exit"]
         else:
             options = [
                 "1. Regen",
@@ -377,37 +378,30 @@ class View:
                 "4. Theme",
                 "5. Exit",
             ]
-
-        i = 5
-        for opt in options:
+        if isinstance(options, list):
+            i = 5
+            for opt in options:
+                py = self.window_height - (self.cell_size * i)
+                self.mlx.mlx_string_put(self.ptr[0],
+                                        self.ptr[1],
+                                        int(self.horizontal_margin / 2),
+                                        py,
+                                        COLOR.WHITE,
+                                        opt)
+                i -= 1
+        else:
             self.mlx.mlx_string_put(self.ptr[0],
                                     self.ptr[1],
                                     int(self.horizontal_margin / 2),
-                                    self.window_height - (self.cell_size * i),
-                                    0xFFFFFFFF,
-                                    opt)
-            i -= 1
+                                    self.window_height - self.cell_size * 2,
+                                    COLOR.WHITE,
+                                    options)
 
     def setup_hooks(self) -> None:
         """Register MLX event handlers."""
-        self.mlx.mlx_key_hook(
-            self.ptr[1],
-            self.on_key,
-            None
-        )
-
-        self.mlx.mlx_hook(
-            self.ptr[1],
-            33,
-            0,
-            self.on_destroy,
-            None
-        )
-        self.mlx.mlx_loop_hook(
-        self.ptr[0],
-        self.animation_loop,
-        None
-        )
+        self.mlx.mlx_key_hook(self.ptr[1], self.on_key, None)
+        self.mlx.mlx_hook(self.ptr[1], 33, 0, self.on_destroy, None)
+        self.mlx.mlx_loop_hook(self.ptr[0], self.animation_loop, None)
 
     def on_key(self, keycode: int, _: Any) -> None:
         """Handle keyboard input."""
@@ -424,14 +418,3 @@ class View:
         margin = self.horizontal_margin // 2
         self.mlx.mlx_put_image_to_window(self.ptr[0], self.ptr[1], self.ptr[2],
                                          margin, margin)
-
-        """ def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum)
-
-        def on_destroy(_: Any) -> None:
-            self.clean_shutdown()
-        stuff = [1, 2]
-        self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
-        self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
-        self.mlx.mlx_loop(self.ptr[0])
-        self.clean_shutdown() """
