@@ -70,6 +70,8 @@ class View:
         """
         self.config = config
         self.mazegen = mazegen
+        if self.mazegen.width >= 25:
+            self.vertical_margin = self.horizontal_margin * 2
         self.window_width = (mazegen.width * self.cell_size
                              + self.horizontal_margin)
         self.window_height = (mazegen.height * self.cell_size
@@ -80,10 +82,18 @@ class View:
         Handles the user interactions through specific keys
         """
         if keycode == 49 or keycode == 65436:
+            self.show_solution = False
+            self.animating = False
             self.redo_maze()
         elif keycode == 50 or keycode == 65433:
             if self.show_solution:
                 self.show_solution = False
+                self.animating = False
+                self.draw_and_show()
+            elif self.animation_index == len(self.mazegen.solution) - 1:
+                self.show_solution = False
+                self.animating = False
+                self.animation_index = 0
                 self.draw_and_show()
             else:
                 self.show_solution = True
@@ -93,8 +103,12 @@ class View:
             primary = self.theme[1]["walls"]
             self.theme[1]['background'] = primary
             self.theme[1]['walls'] = bg
+            self.show_solution = False
+            self.animating = False
             self.draw_and_show()
         elif keycode == 52 or keycode == 65430:
+            self.show_solution = False
+            self.animating = False
             if self.theme[0] == 'nostromo':
                 self.theme = THEMES[1]
             elif self.theme[0] == 'nautilus':
@@ -139,6 +153,10 @@ class View:
 
         if self.animating:
             self.animating = False
+            self.show_solution = False
+            self.animation_index = 0
+            self.last_animation_delay = 0.0
+            self.draw_and_show()
             return
 
         self.animation_index = 0
@@ -154,15 +172,17 @@ class View:
         x, y = cell.position
 
         self.draw_rectangle(
-            x * self.cell_size + 2,
-            y * self.cell_size + 2,
-            self.cell_size - 5,
-            self.cell_size - 5,
+            x * self.cell_size + 4,
+            y * self.cell_size + 4,
+            self.cell_size - 10,
+            self.cell_size - 10,
             self.theme[1]["solution"]
         )
 
     def animation_loop(self, _: Any) -> None:
-        if not self.animating:
+        if not self.animating or not self.show_solution:
+            self.show_solution = False
+            self.animating = False
             return
 
         now = time.time()
@@ -242,15 +262,8 @@ class View:
             color = self.theme[1]["exit"]
         else:
             return
-        
 
-        self.draw_rectangle(
-            px,
-            py,
-            size,
-            size,
-            color
-        )
+        self.draw_rectangle(px, py, size, size, color)
 
     def draw_cell_walls(
         self,
@@ -266,39 +279,71 @@ class View:
 
         # North
         if cell.walls & 1:
-            self.draw_rectangle(
-                px, py,
-                self.cell_size, wall,
-                color
-            )
+            if y == 0 or y == self.mazegen.width - 1:
+                self.draw_rectangle(
+                    px, py,
+                    self.cell_size, wall * 2,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px, py,
+                    self.cell_size, wall,
+                    color
+                )
 
         # West
         if cell.walls & 8:
-            self.draw_rectangle(
-                px, py,
-                wall, self.cell_size,
-                color
-            )
+            if x == 0:
+                self.draw_rectangle(
+                    px, py,
+                    wall * 2, self.cell_size,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px, py,
+                    wall, self.cell_size,
+                    color
+                )
 
-        # East only on the right border
-        if x == self.mazegen.width - 1 and cell.walls & 2:
-            self.draw_rectangle(
-                px + self.cell_size - wall,
-                py,
-                wall,
-                self.cell_size,
-                color
-            )
+        # East
+        if cell.walls & 2:
+            if x == self.mazegen.width - 1:
+                self.draw_rectangle(
+                    px + self.cell_size - (wall * 2),
+                    py,
+                    wall * 2,
+                    self.cell_size,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px + self.cell_size - wall,
+                    py,
+                    wall * 2,
+                    self.cell_size,
+                    color
+                )
 
-        # South only on the bottom border
-        if y == self.mazegen.height - 1 and cell.walls & 4:
-            self.draw_rectangle(
-                px,
-                py + self.cell_size - wall,
-                self.cell_size,
-                wall,
-                color
-            )
+        # South
+        if cell.walls & 4:
+            if y == self.mazegen.height - 1:
+                self.draw_rectangle(
+                    px,
+                    py + self.cell_size - (wall * 2),
+                    self.cell_size,
+                    wall * 2,
+                    color
+                )
+            else:
+                self.draw_rectangle(
+                    px,
+                    py + self.cell_size - wall,
+                    self.cell_size,
+                    wall,
+                    color
+                )
 
     def draw_rectangle(
             self, x: int, y: int,
@@ -360,15 +405,21 @@ class View:
         """
         Function that writes the user interaction texts into the window.
         """
-        options: list[str]
+        options: list[str] | str
         if len(self.mazegen.grid[0]) > 6:
-            options = [
-                "1. Re-generate a new maze",
-                "2. Show / Hide the shortest path",
-                "3. Rotate the wall colours",
-                "4. Switch theme",
-                "5. Exit",
-            ]
+            if len(self.mazegen.grid[0]) >= 25:
+                options = ("1. Re-generate a new maze"
+                           + "   2. Show / Hide the shortest path"
+                           + "   3. Rotate the wall colours"
+                           + "   4. Switch theme"
+                           + "   5. Exit")
+            else:
+                options = [
+                    "1. Re-generate a new maze",
+                    "2. Show / Hide the shortest path",
+                    "3. Rotate the wall colours",
+                    "4. Switch theme",
+                    "5. Exit"]
         else:
             options = [
                 "1. Regen",
@@ -377,37 +428,30 @@ class View:
                 "4. Theme",
                 "5. Exit",
             ]
-
-        i = 5
-        for opt in options:
+        if isinstance(options, list):
+            i = 5
+            for opt in options:
+                py = self.window_height - (self.cell_size * i)
+                self.mlx.mlx_string_put(self.ptr[0],
+                                        self.ptr[1],
+                                        int(self.horizontal_margin / 2),
+                                        py,
+                                        0xFFFFFF,
+                                        opt)
+                i -= 1
+        else:
             self.mlx.mlx_string_put(self.ptr[0],
                                     self.ptr[1],
                                     int(self.horizontal_margin / 2),
-                                    self.window_height - (self.cell_size * i),
-                                    0xFFFFFFFF,
-                                    opt)
-            i -= 1
+                                    self.window_height - self.cell_size * 2,
+                                    0xFFFFFF,
+                                    options)
 
     def setup_hooks(self) -> None:
         """Register MLX event handlers."""
-        self.mlx.mlx_key_hook(
-            self.ptr[1],
-            self.on_key,
-            None
-        )
-
-        self.mlx.mlx_hook(
-            self.ptr[1],
-            33,
-            0,
-            self.on_destroy,
-            None
-        )
-        self.mlx.mlx_loop_hook(
-        self.ptr[0],
-        self.animation_loop,
-        None
-        )
+        self.mlx.mlx_key_hook(self.ptr[1], self.on_key, None)
+        self.mlx.mlx_hook(self.ptr[1], 33, 0, self.on_destroy, None)
+        self.mlx.mlx_loop_hook(self.ptr[0], self.animation_loop, None)
 
     def on_key(self, keycode: int, _: Any) -> None:
         """Handle keyboard input."""
@@ -424,14 +468,3 @@ class View:
         margin = self.horizontal_margin // 2
         self.mlx.mlx_put_image_to_window(self.ptr[0], self.ptr[1], self.ptr[2],
                                          margin, margin)
-
-        """ def on_key(keynum: int, _: Any) -> None:
-            self.key_handler(keynum)
-
-        def on_destroy(_: Any) -> None:
-            self.clean_shutdown()
-        stuff = [1, 2]
-        self.mlx.mlx_key_hook(self.ptr[1], on_key, stuff)
-        self.mlx.mlx_hook(self.ptr[1], 33, 0, on_destroy, None)
-        self.mlx.mlx_loop(self.ptr[0])
-        self.clean_shutdown() """
