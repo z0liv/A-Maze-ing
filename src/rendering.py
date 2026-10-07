@@ -94,7 +94,7 @@ class View:
                 self.show_solution = False
                 self.animating = False
                 self.animation_index = 0
-                self.draw_and_show
+                self.draw_and_show()
             else:
                 self.show_solution = True
                 self.toggle_solution_animation()
