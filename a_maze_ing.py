@@ -7,7 +7,7 @@ from src.config import load_config_model
 def main() -> None:
     """
     Main function of the project.
-    
+
     Reads the config file and stores the values on the
     Config instance and instances the MazeGenerator
     loads the instances into the View class and generates the view.
@@ -35,7 +35,7 @@ def main() -> None:
     except KeyboardInterrupt as error:
         print(error)
     except OSError as error:
-        print(error) 
+        print(error)
     except Exception as error:
         print(error)
 

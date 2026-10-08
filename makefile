@@ -22,10 +22,10 @@ install: create-venv requirements.txt
 	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) -m pip install mlx-2.4-py3-none-any.whl
 
-lint: 
+lint: install
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)
 
-lint-strict:
+lint-strict: install
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY_STRICT) 
 
 clean:

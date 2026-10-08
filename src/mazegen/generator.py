@@ -95,6 +95,8 @@ class MazeGenerator:
         """
         Helper function to generate the maze based on the selected
         algorithm, store the solution path and exporting it.
+        If the perfect flag is set to false, calls the function
+        that makes the maze imperfect.
         """
         if self.seed is not None and self.use_seed:
             rnd = Random(self.seed)
@@ -107,43 +109,51 @@ class MazeGenerator:
             self.grid = genmaze_dfs(self.grid, self.entry, rnd)
 
         if (not self.perfect):
-            max_pattern_dead_ends = 2
-            while True:
-                dead_ends = self.get_dead_ends()
-                if not dead_ends:
-                    break
-                normal_dead_ends = [
-                    dead_end for dead_end in dead_ends
-                    if not dead_end[1]
-                ]
-                pattern_dead_ends = [
-                    dead_end for dead_end in dead_ends
-                    if dead_end[1]
-                ]
-                if normal_dead_ends:
-                    candidates = normal_dead_ends
-                elif len(pattern_dead_ends) <= max_pattern_dead_ends:
-                    break
-                else:
-                    candidates = pattern_dead_ends
-                removed = False
-                for cell, _ in candidates:
-                    directions = self.get_removable_walls(cell)
-                    shuffle(directions)
-                    for direction in directions:
-                        if self.remove_wall_if_valid(cell, direction):
-                            removed = True
-                            break
-                    if removed:
-                        break
-                if not removed:
-                    break
+            self.make_imperfect()
 
         self.solution = solve_maze_bfs(self.grid, self.entry, self.exit)
 
         active_solution_path(self.solution)
         export_maze(self.grid, self.entry, self.exit,
                     self.output_file, self.solution)
+
+    def make_imperfect(self) -> None:
+        """
+        Makes the maze imperfect. While the maze has dead-ends, tries to
+        remove it, if able, searches for another one, until the remainging
+        two dead-ends are left.
+        """
+        max_pattern_dead_ends = 2
+        while True:
+            dead_ends = self.get_dead_ends()
+            if not dead_ends:
+                break
+            normal_dead_ends = [
+                dead_end for dead_end in dead_ends
+                if not dead_end[1]
+            ]
+            pattern_dead_ends = [
+                dead_end for dead_end in dead_ends
+                if dead_end[1]
+            ]
+            if normal_dead_ends:
+                candidates = normal_dead_ends
+            elif len(pattern_dead_ends) <= max_pattern_dead_ends:
+                break
+            else:
+                candidates = pattern_dead_ends
+            removed = False
+            for cell, _ in candidates:
+                directions = self.get_removable_walls(cell)
+                shuffle(directions)
+                for direction in directions:
+                    if self.remove_wall_if_valid(cell, direction):
+                        removed = True
+                        break
+                if removed:
+                    break
+            if not removed:
+                break
 
     def generate_grid(self) -> list[list[Cell]]:
         """
@@ -167,6 +177,15 @@ class MazeGenerator:
         return grid
 
     def get_dead_ends(self) -> list[tuple[Cell, bool]]:
+        """
+        Searches for dead ends in the maze, a dead-end being a cell with only
+        one conneted neighbour. It also checks if the dead-end it's part of
+        the pattern.
+
+        Returns:
+            A list of tuples, each tuple containing the cell that is a dead-end
+            and a boolean that tells if it's part of the pattern.
+        """
         dead_ends: list[tuple[Cell, bool]] = []
 
         for row in self.grid:
@@ -190,6 +209,16 @@ class MazeGenerator:
             self,
             cell: Cell
     ) -> list[DIRECTION]:
+        """
+        A function that is called when a dead-end is found,
+        it checks which of the cell's walls are removable.
+
+        Args:
+            cell (Cell): The cell that is a dead-end.
+        Returns:
+            A list of directions, indicating that the wall of the cell is
+            removable in that direction.
+        """
         neighbours = get_not_connected_neighbours(cell, self.grid)
         return [
             direction for neighbour, direction in neighbours
@@ -201,6 +230,18 @@ class MazeGenerator:
             target_cell: Cell,
             direction: DIRECTION
     ) -> bool:
+        """
+        Checks if the removal of the wall indicated by the given cell and the
+        direction is valid.
+
+        Args:
+            target_cell (Cell): The target cell from which a wall must be
+                                removed.
+            direction (DIRECTION): The direction that points the wall that is
+                                   going to be checked.
+        Returns:
+            A boolean that tells if the wall can be removed or not.
+        """
         dx, dy = {
             DIRECTION.NORTH: (0, -1),
             DIRECTION.EAST: (1, 0),
@@ -234,6 +275,22 @@ def check_full_conectivity(
         height: int,
         width: int
 ) -> bool:
+    """
+    Checks if the maze is fully connected, meaning there are no enclosed cells
+    or passages. It searches for every reachable cell, until no connected cells
+    are left.
+
+    Args:
+        grid (list[list[Celll]]): Stores all the cells of the maze.
+        entry (Cell): The entry cell
+        pattern: (bool): A boolean that indicates if the pattern is active
+                         in the maze.
+        height (int): The number of rows of the maze.
+        width (int): The number of cells in each row of the maze.
+
+    Returns:
+        A boolean that tells if it is fully connected or not.
+    """
     seen: set[Cell] = {entry}
     queue: deque[Cell] = deque([entry])
     while queue:
@@ -253,6 +310,16 @@ def check_full_conectivity(
 
 
 def check_open_areas(grid: list[list[Cell]]) -> bool:
+    """
+    Checks if a 3x3 empty area is created when attempting to remove a wall.
+
+    Args:
+        grid (list[list[Cell]]): Stores all the cells of the maze.
+
+    Returns:
+        A boolean that indicates if a open area is generated when trying to
+        remove the wall.
+    """
     for row in grid:
         for cell in row:
             if (cell.walls == 0):
@@ -262,6 +329,18 @@ def check_open_areas(grid: list[list[Cell]]) -> bool:
 
 
 def check_open_neighbours(grid: list[list[Cell]], cell: Cell) -> int:
+    """
+    A helper fucntion that checks the disposition of all eight neighbour
+    cell's walls.
+
+    Args:
+        grid (list[list[Cell]]): Stores all the cells of the maze.
+        cell (Cell): The target cell from which the neighbours are cheked.
+
+    Returns:
+        The count of neighbour cells that are correctly disposed to form a
+        3x3 empty area.
+    """
     x, y = cell.position
     count: int = 0
     # North
