@@ -148,7 +148,6 @@ class MazeGenerator:
             removed = False
             for cell, _ in candidates:
                 directions = self.get_removable_walls(cell)
-                shuffle(directions)
                 for direction in directions:
                     if self.remove_wall_if_valid(cell, direction):
                         removed = True
