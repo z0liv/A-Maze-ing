@@ -5,3 +5,5 @@ __pycache__/
 .pytest_cache/
 maze.txt
 output_maze.txt
+dist/
+*.egg-info
