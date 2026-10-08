@@ -82,6 +82,7 @@ class View:
         """
         self.config = config
         self.mazegen = mazegen
+        self.closing = False
         if self.mazegen.width >= 25:
             self.vertical_margin = self.horizontal_margin * 2
         self.window_width = (mazegen.width * self.cell_size
@@ -161,11 +162,34 @@ class View:
         self.setup_hooks()
         self.mlx.mlx_loop(self.ptr[0])
 
+        self.clean_shutdown()
+
     def clean_shutdown(self) -> None:
         """
         Cleans the pointers and does a safe exit.
         """
+        if self.closing:
+            return
+        self.closing = True
+        self.animating = False
+        self.show_solution = False
         self.mlx.mlx_loop_exit(self.ptr[0])
+        self.release()
+
+    def release(self) -> None:
+        """
+        Release all MLX resources owned by the view.
+        """
+        mlx_ptr, win_ptr, img_ptr = self.ptr
+
+        if img_ptr is not None:
+            self.mlx.mlx_destroy_image(mlx_ptr, img_ptr)
+
+        if win_ptr is not None:
+            self.mlx.mlx_destroy_window(mlx_ptr, win_ptr)
+
+        if mlx_ptr is not None:
+            self.mlx.mlx_release(mlx_ptr)
 
     def toggle_solution_animation(self) -> None:
         """Start or stop the solution animation."""
