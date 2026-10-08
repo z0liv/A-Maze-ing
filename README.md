@@ -29,7 +29,7 @@ The project is split into two parts:
 - Python **3.10 or newer**.
 - A graphical environment supported by the project's `mlx` / MiniLibX package.
 - The dependencies in `requirements.txt`.
-- The local wheel files expected by the supplied Makefile: `dist/mlx-2.4-py3-none-any.whl` and `dist/mazegen-1.0.0-py3-none-any.whl`.
+- The local wheel files expected by the supplied Makefile: `mlx-2.4-py3-none-any.whl` and `mazegen-1.0.0-py3-none-any.whl`.
 
 On Linux, a working display server is required. On WSL, ensure WSLg or another supported X/Wayland configuration is functioning before starting the application.
 
@@ -41,16 +41,15 @@ From the repository root, install the project dependencies and local wheels usin
 make install
 ```
 
-The Makefile expects the two wheel files listed above to exist in `dist/`. If they are not provided in your checkout, build or obtain them before using the corresponding Makefile targets.
+The Makefile expects the two wheel files listed above to exist in the root of the repository. If they are not provided in your checkout, build or obtain them before using the corresponding `make build` or `make install` rule.
 
-To build the reusable `mazegen` wheel from the package directory, install the build frontend if necessary and run:
+To build the reusable `mazegen` wheel from the package directory, run the `make build` rule:
 
 ```bash
-python3 -m pip install build
-python3 -m build --wheel
+make build
 ```
 
-Run this from the directory containing `pyproject.toml` and the `mazegen/` package. The generated wheel is written to `dist/`.
+Run this from the directory containing `pyproject.toml` and the `mazegen/` package. The generated wheel is written to `dist/` and then it moves to the root directory.
 
 ### Run the application
 
@@ -60,7 +59,7 @@ Use the default configuration:
 make run
 ```
 
-Or provide a configuration file explicitly:
+Or provide a configuration file explicitly after creating the virtual environment with the required dependencies:
 
 ```bash
 .venv/bin/python3 a_maze_ing.py config.txt
@@ -118,13 +117,24 @@ The parser splits each setting at the first `=`. The configuration is validated 
 Two generation algorithms are available:
 
 - **Aldous–Broder (`ab`, default):** performs a random walk through the grid. When the walk first reaches an unvisited cell, it connects that cell to the previously visited cell. Continuing until all cells have been visited produces a spanning tree, and therefore a perfect maze. It is conceptually simple and gives each spanning tree equal probability, although it can take a long time to visit every cell in larger grids.
+
+    #### Why Aldous-Broder?
+    Aldous–Broder was chosen despite not being the most optimized algorithm, as its implementation was simpler and easier to understand as a initial approach.
 - **Depth-First Search (`dfs`):** explores unvisited neighbours and backtracks when it reaches a dead end. This is efficient and straightforward to implement, and produces a perfect maze when used without the later modifications for imperfect generation. Its paths often have a more winding, corridor-like appearance.
+
+    #### Why Depth-First Search (DFS)?
+    Depth-First Search (DFS) was implemented to satisfy the bonus requirement for multiple generation strategies and to offer a faster, more performance-efficient alternative.
 
 The default is **Aldous–Broder**, while DFS is available as an alternative so the user can compare the results. The project keeps generation separate from rendering, making it possible to change the generation algorithm without rewriting the graphical view.
 
+#### Maze Solving Algorithm:
+
 **BFS (Breadth-First Search)** is used after generation to find a shortest route from the entry to the exit. Since movement between adjacent cells has equal cost, BFS finds a path with the fewest cell-to-cell moves. The resulting ordered list of cells is used by the application to animate the solution.
 
-When `PERFECT=False`, the generator supports imperfect-maze generation by introducing additional openings while maintaining connectivity. This creates alternative routes and loops rather than a single unique route. A seed allows the same configuration and algorithm to reproduce the same generation sequence.
+#### Why BFS (Breadth-First Search)?
+Breadth-First Search (BFS) was selected as the maze-solving algorithm to meet the resolution requirement, following peer recommendations highlighting its efficiency and ease of implementation.
+
+When `PERFECT=False` (the default), the generator supports imperfect-maze generation by introducing additional openings while maintaining connectivity. This creates alternative routes and loops rather than a single unique route. A seed allows the same configuration and algorithm to reproduce the same generation sequence.
 
 ## Reusable code: the `mazegen` package
 
@@ -133,7 +143,7 @@ The `mazegen` package is deliberately separated from the graphical interface. It
 ### Install and import
 
 ```bash
-python3 -m pip install dist/mazegen-1.0.0-py3-none-any.whl
+python3 -m pip install mazegen-1.0.0-py3-none-any.whl
 ```
 
 ```python
@@ -196,27 +206,27 @@ mazegen/
 ├── config.py
 ├── errors.py
 ├── export.py
-└── README.md
+├── README.md
+└── LICENSE.md
 ```
 
 The library has no dependency on the graphical renderer: other projects can reuse maze generation, solving, cell data, and export functionality without opening a window.
 
 ## Teamwork and project management
 
-### Team and roles
+### Team and Collaborative Approach
 
-The project was developed by **jrecio-t** and **omarquez**. The supplied commit history shows work across the generator, rendering, configuration, interactive controls, validation, documentation, and packaging. Since the provided log excerpt does not associate each commit with an author, the division below describes the main workstreams rather than claiming an exact per-person commit count.
+The project was co-developed by jrecio-t and omarquez through a close, joint effort. The commit history reflects a shared contribution across all major areas of the application, including generation logic, rendering, configuration, interactive controls, validation, documentation, and packaging. Rather than dividing the project into isolated tasks, both developers worked collaboratively across the primary workstreams outlined below:
 
-- **Maze algorithms and reusable library:** implementation and integration of Aldous–Broder, DFS, BFS, cell/wall utilities, perfect/imperfect maze handling, seed reproducibility, and text export.
-- **Graphical interface and interaction:** MiniLibX rendering, grid and wall drawing, entry/exit display, solution-path visualization and animation, themes, colour switching, regeneration, and application shutdown.
-- **Configuration and reliability:** configuration model and parsing, validation and error handling, command-line argument handling, and fixes for rendering and generation edge cases.
-- **Code quality and distribution:** docstrings, linting and strict type checking, Makefile improvements, separation of `mazegen` from the UI, and building a distributable wheel with its own README.
+Maze Algorithms & Reusable Library: Implementation and integration of Aldous–Broder, DFS, and BFS algorithms, cell/wall utilities, support for perfect/imperfect mazes, seed-based reproducibility, and text export functionality.
 
-These workstreams overlap: the commit history contains integration merges and fixes that touch more than one component. For an exact individual attribution, consult the full Git log with author metadata.
+Graphical Interface & User Interaction: Joint development of the MiniLibX rendering pipeline, grid and wall drawing, entry/exit indicators, animated solution-path visualization, custom themes, dynamic color switching, regeneration controls, and application lifecycle management.
+
+Configuration & System Reliability: Collaborative design of the configuration model and parser, robust validation, error handling, command-line argument processing, and edge-case fixes for both generation and rendering.
+
+Code Quality & Packaging: Shared responsibility for writing docstrings, enforcing linting and strict type checking, refining the Makefile, decoupling the core logic (mazegen) from the UI, and building a distributable wheel complete with documentation.
 
 ### Planning and how it evolved
-
-The history indicates an iterative development process:
 
 1. **Core generator and configuration:** establish configuration parsing, parameter validation, the `Cell` and generator abstractions, and the initial generation algorithms.
 2. **Graphical rendering:** build the grid and wall renderer, then refine cell borders, corners, margins, entry/exit drawing, and rendering performance.
@@ -241,8 +251,8 @@ The plan therefore evolved from proving the basic generation and display pipelin
 - Agreeing on module boundaries and public interfaces earlier could reduce integration fixes and overlapping changes.
 - A written task board with owners, estimates, and milestones would make the plan and individual responsibilities clearer.
 - Automated tests for generation invariants, entry-to-exit reachability, perfect-maze properties, seed reproducibility, and exported-file formatting would catch regressions earlier.
-- GUI testing should include documented display-environment requirements and repeatable manual test steps.
 - Commit messages and merge practices could consistently identify the scope of a change, making retrospective contribution tracking easier.
+- Implementation of additional user interactions and implementation of the maze generation animation.
 
 ### Tools used
 
@@ -260,6 +270,7 @@ The Makefile provides project shortcuts, including:
 
 ```bash
 make install       # Create the virtual environment and install dependencies/wheels
+make build         # Builds the whl and tar.gz packages.
 make run           # Launch the application with config.txt
 make lint          # Run style and type checks
 make lint-strict   # Run stricter type checks
@@ -273,14 +284,20 @@ The install and quality-check targets rely on the local wheels described in the 
 ### References
 
 - [Python documentation](https://docs.python.org/3/)
-- [Pydantic documentation](https://docs.pydantic.dev/)
-- [Setuptools documentation](https://setuptools.pypa.io/)
-- [Python Packaging User Guide — packaging projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+- [Pydantic documentation](https://docs.pydantic.dev/) - For building the Model of the Config file.
+- [Setuptools documentation](https://setuptools.pypa.io/) - For packaging the mazegen module.
+- [Python Packaging User Guide — packaging projects](https://packaging.python.org/en/latest/tutorials/packaging-projects/) - For packaging the mazegen module.
 - [Aldous–Broder algorithm](https://en.wikipedia.org/wiki/Maze_generation_algorithm#Aldous-Broder_algorithm)
 - [Depth-first search](https://en.wikipedia.org/wiki/Depth-first_search)
 - [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
-- [MiniLibX](https://github.com/42Paris/minilibx-linux) (Linux implementation reference)
-
+- [MiniLibX 42](https://github.com/42Paris/minilibx-linux)
+- [MiniLibX Python](https://sarafreitas-dev.github.io/MinilibX-42-Pyhton-Documentation/) - Python Documentation.
+- [GeeksForGeeks](https://www.geeksforgeeks.org/python/python-docstrings/) - Guide to understand how to make a Docstring.
+- [Earthly](https://earthly.dev/blog/python-makefile/) - Documentation to build a Makefile for a python project.
+- [Michelletann](https://michelletann.com/post/using-a-make-file) - Documentation to build a Makefile for a python project.
+- [GeeksForGeeks PDB](https://www.geeksforgeeks.org/python/python-debugger-python-pdb/) - Guide to use the Python built in Debugger.
+- [Medium](https://medium.com/@luthfisauqi17_68455/artificial-intelligence-search-problem-solve-maze-using-breadth-first-search-bfs-algorithm-255139c6e1a3) - Understanding the Breadth first search algorithm to solve the maze.
+- [License For Open Source Projects](https://medium.com/@madhanrkv10/how-to-add-license-for-your-open-source-projects-on-github-d9b8434c6f6b)
 ### Use of AI
 
 AI assistance was used as a supporting tool during development and documentation. It was used to help explain and review algorithmic approaches (including DFS and BFS), reason about maze-generation and rendering bugs, discuss Python implementation details, and improve documentation and README structure. AI suggestions were treated as guidance: implementation choices and project-specific behaviour were checked against the code and adapted to the project. AI was not a substitute for understanding, integrating, or validating the submitted work.

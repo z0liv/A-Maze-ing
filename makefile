@@ -49,4 +49,4 @@ clean:
 create-venv:
 	python3 -m venv .venv
 
-.PHONY: run install lint lint-strict clean
+.PHONY: run install lint lint-strict clean build debug
