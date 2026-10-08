@@ -216,6 +216,20 @@ The library has no dependency on the graphical renderer: other projects can reus
 
 ### Team and Collaborative Approach
 
+### Roles
+
+**jrecio-t**
+- Designing using the MLX Library.
+- Implementation of the DFS Algorithm.
+- Making imperfect mazes.
+- Making pydantic model for the config file keys.
+
+**omarquez**
+- Organizing and documenting the project.
+- Implementation of Aldous-Broder and BFS Algorithms.
+- Refactoring the rendering.
+- Packaging the mazegen module.
+
 The project was co-developed by jrecio-t and omarquez through a close, joint effort. The commit history reflects a shared contribution across all major areas of the application, including generation logic, rendering, configuration, interactive controls, validation, documentation, and packaging. Rather than dividing the project into isolated tasks, both developers worked collaboratively across the primary workstreams outlined below:
 
 Maze Algorithms & Reusable Library: Implementation and integration of Aldous–Broder, DFS, and BFS algorithms, cell/wall utilities, support for perfect/imperfect mazes, seed-based reproducibility, and text export functionality.

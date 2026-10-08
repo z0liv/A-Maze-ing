@@ -18,6 +18,7 @@ run: install
 
 build: create-venv
 	rm -rf dist
+	$(PIP) install build
 	$(PYTHON) -m build
 	cp dist/*.whl .
 	cp dist/*.tar.gz .
