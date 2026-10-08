@@ -1,5 +1,5 @@
 from collections import deque
-from random import Random, shuffle
+from random import Random
 from .errors import InvalidConfigError
 from .algorithms import (
     genmaze_ab, genmaze_dfs,
@@ -68,6 +68,9 @@ class MazeGenerator:
 
         if self.width >= 8 and self.height >= 6:
             self.has_pattern = True
+        if not self.has_pattern:
+            print("[ERROR] The “42” pattern has been omitted,",
+                  "the maze size is too small")
         if self.has_pattern:
             pattern_pos = pattern_positions(calculate_center(self.grid))
             define_pattern(self.grid)
@@ -129,7 +132,6 @@ class MazeGenerator:
                 removed = False
                 for cell, _ in candidates:
                     directions = self.get_removable_walls(cell)
-                    shuffle(directions)
                     for direction in directions:
                         if self.remove_wall_if_valid(cell, direction):
                             removed = True

@@ -26,9 +26,10 @@ class View:
         show_solution (bool): Boolean helper to show the solution animated.
         animating (bool): Boolean that tells if it's actual animating.
         animation_index (int): Index of the solution list.
-        animation_delay (float): Float that represents the delay of the animation.
-        last_animation_delay (float): Float helper that represents the last delay
-                                     in the animating loop.
+        animation_delay (float): Float that represents the
+                                delay of the animation.
+        last_animation_delay (float): Float helper that represents the las
+                                     delay in the animating loop.
         ptr (tuple[int | None, ...]): A tuple of mlx pointers
         mlx (Mlx): The mlx object
         theme (tuple[str, dict[str, COLOR]]) : A tuple that stores the name of
@@ -444,7 +445,7 @@ class View:
             y (int): Vertical position.
             i (int): Horizontal position of the current cell.
             j (int): Vertical position of the current cell.
-            color (COLOR): Hexadecimal value of the color to draw. 
+            color (COLOR): Hexadecimal value of the color to draw.
         """
         px = x * self.cell_size + j
         py = y * self.cell_size + i
