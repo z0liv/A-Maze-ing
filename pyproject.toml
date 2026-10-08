@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "Creating our own maze generating algorithms and maze solving algorithms"
+readme = {file = "mazegen/README.md", content-type = "text/markdown"}
+license = "MIT"
+license-files = ["mazegen/LICENSE.md"]
+authors = [
+    {name = "omarquez", email = "omarquez@student.42urduliz.com"},
+    {name = "jrecio-t", email = "jrecio-t@student.42urduliz.com"},
+]
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+include = ["mazegen*"]
+
+[tool.setuptools.package-data]
+mazegen = ["mazegen/README.md"]
