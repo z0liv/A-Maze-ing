@@ -3,7 +3,7 @@ PYTHON = ${VENV}/python3
 PIP = ${VENV}/pip
 DEBUG = ${PYTHON} -m pdb
 CONFIG = config.txt
-FLAKE = ${VENV}/flake8
+FLAKE = ${VENV}/flake8 .
 MYPY = ${VENV}/mypy . --warn-return-any --warn-unused-ignores \
 --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 MYPY_STRICT = ${VENV}/mypy . --strict
@@ -32,10 +32,12 @@ install: create-venv requirements.txt
 	$(PIP) install mazegen-1.0.0-py3-none-any.whl
 
 lint: install
-	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)
+	$(FLAKE)
+	$(MYPY)
 
 lint-strict: install
-	$(FLAKE) $(MAIN) $(SRC) && $(MYPY_STRICT) 
+	$(FLAKE)
+	$(MYPY_STRICT) 
 
 clean:
 	rm -rf .venv

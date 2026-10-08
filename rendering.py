@@ -163,7 +163,6 @@ class View:
 
     def clean_shutdown(self) -> None:
         """
-        TODO: Search the clean exit
         Cleans the pointers and does a safe exit.
         """
         self.mlx.mlx_loop_exit(self.ptr[0])
