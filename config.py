@@ -4,7 +4,7 @@ from pydantic import (BaseModel,
                       Field,
                       model_validator)
 from typing import Annotated, Any
-from .mazegen.errors import InvalidConfigError, ParamsError
+from mazegen import InvalidConfigError, ParamsError
 
 
 class Config(BaseModel):

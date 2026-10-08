@@ -1,7 +1,7 @@
-from .mazegen import MazeGenerator, Cell
-from .enums import COLOR
-from .themes import THEMES
-from .config import Config
+from mazegen import MazeGenerator, Cell
+from enums import COLOR
+from theme import THEMES
+from config import Config
 from mlx import Mlx
 from typing import Any
 import time

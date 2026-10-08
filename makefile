@@ -1,5 +1,6 @@
 VENV = .venv/bin
 PYTHON = ${VENV}/python3
+PIP = ${VENV}/pip
 DEBUG = ${PYTHON} -m pdb
 CONFIG = config.txt
 FLAKE = ${VENV}/flake8
@@ -7,7 +8,7 @@ MYPY = ${VENV}/mypy . --warn-return-any --warn-unused-ignores \
 --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 MYPY_STRICT = ${VENV}/mypy . --strict
 MAIN = a_maze_ing.py
-SRC = src
+SRC = config.py enums.py rendering.py theme.py
 
 all: run
 
@@ -20,7 +21,8 @@ debug:
 
 install: create-venv requirements.txt
 	$(PYTHON) -m pip install -r requirements.txt
-	$(PYTHON) -m pip install mlx-2.4-py3-none-any.whl
+	$(PIP) install dist/mlx-2.4-py3-none-any.whl
+	$(PIP) install dist/mazegen-1.0.0-py3-none-any.whl
 
 lint: install
 	$(FLAKE) $(MAIN) $(SRC) && $(MYPY)

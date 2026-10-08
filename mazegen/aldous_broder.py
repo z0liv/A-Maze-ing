@@ -1,5 +1,5 @@
 from random import Random
-from ..cell import Cell
+from .cell import Cell
 from .alg_utils import get_free_cells, get_neighbours, opposite
 
 

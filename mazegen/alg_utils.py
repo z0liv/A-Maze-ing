@@ -1,5 +1,5 @@
-from .. import Cell
-from ..enums import DIRECTION
+from . import Cell
+from .enums import DIRECTION
 
 
 def get_neighbours(

@@ -1,4 +1,4 @@
-from ..enums import COLOR
+from enums import COLOR
 
 """
     Helper variable to store the fixed themes.

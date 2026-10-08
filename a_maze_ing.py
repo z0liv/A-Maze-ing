@@ -1,7 +1,7 @@
-from src.mazegen import MazeGenerator
-from src.mazegen.errors import ParamsError, InvalidConfigError
-from src.rendering import View
-from src.config import load_config_model
+from mazegen import MazeGenerator
+from mazegen import ParamsError, InvalidConfigError
+from config import load_config_model
+from rendering import View
 
 
 def main() -> None:

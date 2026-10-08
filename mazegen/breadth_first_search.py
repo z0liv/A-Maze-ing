@@ -1,4 +1,4 @@
-from .. import Cell
+from . import Cell
 from .alg_utils import get_connected_neighbours, unvisit_all_cells
 
 
